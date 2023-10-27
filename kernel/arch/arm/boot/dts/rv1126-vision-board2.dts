@@ -122,7 +122,7 @@
 	pinctrl-0 = <&i2c5m2_xfer>;
 
 	adv7393: adv7393@6a {
-		compatible = "adi,adv7393";
+		compatible = "adi,adv7390";
 		reset-gpios = <&gpio1 RK_PC1 GPIO_ACTIVE_HIGH>;
 		reg = <0x6a>;
 
