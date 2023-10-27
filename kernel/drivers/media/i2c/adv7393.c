@@ -26,6 +26,7 @@
 #include <linux/slab.h>
 #include <linux/i2c.h>
 #include <linux/device.h>
+#include <linux/gpio/consumer.h>
 #include <linux/delay.h>
 #include <linux/module.h>
 #include <linux/videodev2.h>
@@ -53,6 +54,10 @@ struct adv7393_state {
 	u8 reg35;
 	u8 reg80;
 	u8 reg82;
+	u8 reg8C;
+	u8 reg8D;
+	u8 reg8E;
+	u8 reg8F;
 	u32 output;
 	v4l2_std_id std;
 };
@@ -76,31 +81,46 @@ static inline int adv7393_write(struct v4l2_subdev *sd, u8 reg, u8 value)
 
 static const u8 adv7393_init_reg_val[] = {
 	ADV7393_SOFT_RESET, ADV7393_SOFT_RESET_DEFAULT,
-	ADV7393_POWER_MODE_REG, ADV7393_POWER_MODE_REG_DEFAULT,
+	// ADV7393_POWER_MODE_REG, ADV7393_POWER_MODE_REG_DEFAULT,
 
-	ADV7393_HD_MODE_REG1, ADV7393_HD_MODE_REG1_DEFAULT,
-	ADV7393_HD_MODE_REG2, ADV7393_HD_MODE_REG2_DEFAULT,
-	ADV7393_HD_MODE_REG3, ADV7393_HD_MODE_REG3_DEFAULT,
-	ADV7393_HD_MODE_REG4, ADV7393_HD_MODE_REG4_DEFAULT,
-	ADV7393_HD_MODE_REG5, ADV7393_HD_MODE_REG5_DEFAULT,
-	ADV7393_HD_MODE_REG6, ADV7393_HD_MODE_REG6_DEFAULT,
-	ADV7393_HD_MODE_REG7, ADV7393_HD_MODE_REG7_DEFAULT,
+	// ADV7393_HD_MODE_REG1, ADV7393_HD_MODE_REG1_DEFAULT,
+	// ADV7393_HD_MODE_REG2, ADV7393_HD_MODE_REG2_DEFAULT,
+	// ADV7393_HD_MODE_REG3, ADV7393_HD_MODE_REG3_DEFAULT,
+	// ADV7393_HD_MODE_REG4, ADV7393_HD_MODE_REG4_DEFAULT,
+	// ADV7393_HD_MODE_REG5, ADV7393_HD_MODE_REG5_DEFAULT,
+	// ADV7393_HD_MODE_REG6, ADV7393_HD_MODE_REG6_DEFAULT,
+	// ADV7393_HD_MODE_REG7, ADV7393_HD_MODE_REG7_DEFAULT,
 
-	ADV7393_SD_MODE_REG1, ADV7393_SD_MODE_REG1_DEFAULT,
-	ADV7393_SD_MODE_REG2, ADV7393_SD_MODE_REG2_DEFAULT,
-	ADV7393_SD_MODE_REG3, ADV7393_SD_MODE_REG3_DEFAULT,
-	ADV7393_SD_MODE_REG4, ADV7393_SD_MODE_REG4_DEFAULT,
-	ADV7393_SD_MODE_REG5, ADV7393_SD_MODE_REG5_DEFAULT,
-	ADV7393_SD_MODE_REG6, ADV7393_SD_MODE_REG6_DEFAULT,
-	ADV7393_SD_MODE_REG7, ADV7393_SD_MODE_REG7_DEFAULT,
-	ADV7393_SD_MODE_REG8, ADV7393_SD_MODE_REG8_DEFAULT,
+	// ADV7393_SD_MODE_REG1, ADV7393_SD_MODE_REG1_DEFAULT,
+	// ADV7393_SD_MODE_REG2, ADV7393_SD_MODE_REG2_DEFAULT,
+	// ADV7393_SD_MODE_REG3, ADV7393_SD_MODE_REG3_DEFAULT,
+	// ADV7393_SD_MODE_REG4, ADV7393_SD_MODE_REG4_DEFAULT,
+	// ADV7393_SD_MODE_REG5, ADV7393_SD_MODE_REG5_DEFAULT,
+	// ADV7393_SD_MODE_REG6, ADV7393_SD_MODE_REG6_DEFAULT,
+	// ADV7393_SD_MODE_REG7, ADV7393_SD_MODE_REG7_DEFAULT,
+	// ADV7393_SD_MODE_REG8, ADV7393_SD_MODE_REG8_DEFAULT,
 
-	ADV7393_SD_TIMING_REG0, ADV7393_SD_TIMING_REG0_DEFAULT,
+	// ADV7393_SD_TIMING_REG0, ADV7393_SD_TIMING_REG0_DEFAULT,
 
-	ADV7393_SD_HUE_ADJUST, ADV7393_SD_HUE_ADJUST_DEFAULT,
-	ADV7393_SD_CGMS_WSS0, ADV7393_SD_CGMS_WSS0_DEFAULT,
-	ADV7393_SD_BRIGHTNESS_WSS, ADV7393_SD_BRIGHTNESS_WSS_DEFAULT,
+	// ADV7393_SD_HUE_ADJUST, ADV7393_SD_HUE_ADJUST_DEFAULT,
+	// ADV7393_SD_CGMS_WSS0, ADV7393_SD_CGMS_WSS0_DEFAULT,
+	// ADV7393_SD_BRIGHTNESS_WSS, ADV7393_SD_BRIGHTNESS_WSS_DEFAULT,
 };
+
+// static const u8 adv7393_init_reg_val[] = {
+// 	ADV7393_SOFT_RESET, ADV7393_SOFT_RESET_DEFAULT,
+// 	ADV7393_POWER_MODE_REG, 0x1C,
+// 	0x01, 0x00,
+// 	0x80, 0x10,
+// 	0x82, 0xdb,
+// 	0x87, 0x20,
+// 	// 0x8C, 0x55,
+// 	// 0x8D, 0x55,
+// 	// 0x8E, 0x55,
+// 	// 0x8F, 0x25,
+
+
+// };
 
 /*
  *			    2^32
@@ -138,7 +158,7 @@ static int adv7393_setstd(struct v4l2_subdev *sd, v4l2_std_id std)
 	const struct adv7393_std_info *std_info;
 	int num_std;
 	u8 reg;
-	u32 val;
+	u32 val = 0;
 	int err = 0;
 	int i;
 
@@ -161,6 +181,7 @@ static int adv7393_setstd(struct v4l2_subdev *sd, v4l2_std_id std)
 	/* Set the standard */
 	val = state->reg80 & ~SD_STD_MASK;
 	val |= std_info->standard_val3;
+	v4l2_info(sd, "Write to reg: 0x%02X val 0x%02X\n", ADV7393_SD_MODE_REG1, val);
 	err = adv7393_write(sd, ADV7393_SD_MODE_REG1, val);
 	if (err < 0)
 		goto setstd_exit;
@@ -170,6 +191,7 @@ static int adv7393_setstd(struct v4l2_subdev *sd, v4l2_std_id std)
 	/* Configure the input mode register */
 	val = state->reg01 & ~INPUT_MODE_MASK;
 	val |= SD_INPUT_MODE;
+	v4l2_info(sd, "Write to reg: 0x%02X val 0x%02X\n", ADV7393_MODE_SELECT_REG, val);
 	err = adv7393_write(sd, ADV7393_MODE_SELECT_REG, val);
 	if (err < 0)
 		goto setstd_exit;
@@ -177,8 +199,10 @@ static int adv7393_setstd(struct v4l2_subdev *sd, v4l2_std_id std)
 	state->reg01 = val;
 
 	/* Program the sub carrier frequency registers */
+	val = 0;
 	val = std_info->fsc_val;
 	for (reg = ADV7393_FSC_REG0; reg <= ADV7393_FSC_REG3; reg++) {
+		v4l2_info(sd, "Write to reg: 0x%02X val 0x%02X\n", reg, val);
 		err = adv7393_write(sd, reg, val);
 		if (err < 0)
 			goto setstd_exit;
@@ -193,6 +217,7 @@ static int adv7393_setstd(struct v4l2_subdev *sd, v4l2_std_id std)
 	else
 		val &= SD_PEDESTAL_DI;
 
+	v4l2_info(sd, "Write to reg: 0x%02X val 0x%02X\n", ADV7393_SD_MODE_REG2, val);
 	err = adv7393_write(sd, ADV7393_SD_MODE_REG2, val);
 	if (err < 0)
 		goto setstd_exit;
@@ -229,6 +254,7 @@ static int adv7393_setoutput(struct v4l2_subdev *sd, u32 output_type)
 	else
 		val |= ADV7393_SVIDEO_POWER_VALUE;
 
+	v4l2_info(sd, "Write to reg: 0x%02X val 0x%02X\n", ADV7393_POWER_MODE_REG, val);
 	err = adv7393_write(sd, ADV7393_POWER_MODE_REG, val);
 	if (err < 0)
 		goto setoutput_exit;
@@ -237,6 +263,7 @@ static int adv7393_setoutput(struct v4l2_subdev *sd, u32 output_type)
 
 	/* Enable YUV output */
 	val = state->reg02 | YUV_OUTPUT_SELECT;
+	v4l2_info(sd, "Write to reg: 0x%02X val 0x%02X\n", ADV7393_MODE_REG0, val);
 	err = adv7393_write(sd, ADV7393_MODE_REG0, val);
 	if (err < 0)
 		goto setoutput_exit;
@@ -249,6 +276,8 @@ static int adv7393_setoutput(struct v4l2_subdev *sd, u32 output_type)
 		val &= SD_DAC_OUT1_DI;
 	else
 		val |= SD_DAC_OUT1_EN;
+
+	v4l2_info(sd, "Write to reg: 0x%02X val 0x%02X\n", ADV7393_SD_MODE_REG2, val);
 	err = adv7393_write(sd, ADV7393_SD_MODE_REG2, val);
 	if (err < 0)
 		goto setoutput_exit;
@@ -257,6 +286,7 @@ static int adv7393_setoutput(struct v4l2_subdev *sd, u32 output_type)
 
 	/* configure ED/HD Color DAC Swap bit to zero */
 	val = state->reg35 & HD_DAC_SWAP_DI;
+	v4l2_info(sd, "Write to reg: 0x%02X val 0x%02X\n", ADV7393_HD_MODE_REG6, val);
 	err = adv7393_write(sd, ADV7393_HD_MODE_REG6, val);
 	if (err < 0)
 		goto setoutput_exit;
@@ -355,8 +385,9 @@ static int adv7393_initialize(struct v4l2_subdev *sd)
 	int err = 0;
 	int i;
 
+	v4l2_info(sd, "initializing...\n");
 	for (i = 0; i < ARRAY_SIZE(adv7393_init_reg_val); i += 2) {
-
+		v4l2_info(sd, "Write to reg: 0x%02X val 0x%02X\n", adv7393_init_reg_val[i], adv7393_init_reg_val[i+1]);
 		err = adv7393_write(sd, adv7393_init_reg_val[i],
 					adv7393_init_reg_val[i+1]);
 		if (err) {
@@ -364,6 +395,7 @@ static int adv7393_initialize(struct v4l2_subdev *sd)
 			return err;
 		}
 	}
+	v4l2_info(sd, "done\n");
 
 	/* Configure for default video standard */
 	err = adv7393_setoutput(sd, state->output);
@@ -386,6 +418,17 @@ static int adv7393_probe(struct i2c_client *client,
 {
 	struct adv7393_state *state;
 	int err;
+	struct device *dev = &client->dev;
+	struct gpio_desc *reset_gpio;
+	reset_gpio = devm_gpiod_get(dev, "reset", GPIOD_OUT_LOW);
+	if (IS_ERR(reset_gpio))
+		dev_warn(dev, "Failed to get reset-gpios\n");
+	else {
+		dev_info(dev, "Reset\n");
+		gpiod_set_value_cansleep(reset_gpio, 0);
+		usleep_range(1000, 1500);
+		gpiod_set_value_cansleep(reset_gpio, 1);
+	}
 
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -ENODEV;
@@ -397,10 +440,10 @@ static int adv7393_probe(struct i2c_client *client,
 	if (state == NULL)
 		return -ENOMEM;
 
-	state->reg00	= ADV7393_POWER_MODE_REG_DEFAULT;
+	state->reg00	= 0x1C;
 	state->reg01	= 0x00;
-	state->reg02	= 0x20;
-	state->reg35	= ADV7393_HD_MODE_REG6_DEFAULT;
+	//state->reg02	= 0x20;
+	//state->reg35	= ADV7393_HD_MODE_REG6_DEFAULT;
 	state->reg80	= ADV7393_SD_MODE_REG1_DEFAULT;
 	state->reg82	= ADV7393_SD_MODE_REG2_DEFAULT;
 

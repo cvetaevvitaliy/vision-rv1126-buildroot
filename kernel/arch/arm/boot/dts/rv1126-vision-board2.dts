@@ -5,6 +5,7 @@
 /dts-v1/;
 #include "rv1126.dtsi"
 #include "rv1126-vision-board-def.dtsi"
+#include <dt-bindings/display/media-bus-format.h>
 
 
 / {
@@ -29,6 +30,51 @@
             default-state = "off";
         };
     };
+
+	panel: panel {
+		compatible = "simple-panel";
+		status = "okay";
+		bus-format = <MEDIA_BUS_FMT_YUYV8_2X8>;
+		reset-delay-ms = <10>;
+		prepare-delay-ms = <20>;
+		unprepare-delay-ms = <20>;
+		disable-delay-ms = <20>;
+		width-mm = <95>;
+		height-mm = <54>;
+		bpc = <6>;
+
+
+		display-timings {
+			native-mode = <&stt0430_enl2c_timing>;
+
+			stt0430_enl2c_timing: timing0 {
+					//clock-frequency = <24540000>;
+					clock-frequency = <25175000>;
+					//clock-frequency = <27000000>;
+
+					hactive = <640>;
+					vactive = <480>;
+					hback-porch = <48>;
+					hfront-porch = <16>;
+					vfront-porch = <10>;
+					vback-porch = <33>;
+					hsync-len = <96>;
+					vsync-len = <2>;
+					hsync-active = <0>;
+					vsync-active = <0>;
+					de-active = <0>;
+					pixelclk-active = <0>;
+					//interlaced;
+					doubleclk; //only NTSC(480i60) mode and PAL(576i50) mode need this property
+			};
+		};
+
+		port {
+			panel_in_rgb: endpoint {
+				remote-endpoint = <&rgb_out_panel>;
+			};
+		};
+	};
 
 };
 
@@ -67,6 +113,62 @@
 	rockchip,baudrate = <115200>;
 };
 
+
+&i2c5 {
+	/delete-property/ pinctrl-0;
+	status = "okay";
+	clock-frequency = <400000>;
+	pinctrl-0 = <&i2c5m2_xfer>;
+
+	adv7393: adv7393@6a {
+		compatible = "adi,adv7393";
+		reset-gpios = <&gpio1 RK_PC1 GPIO_ACTIVE_HIGH>;
+		reg = <0x6a>;
+
+	};
+};
+
+&display_subsystem {
+	status = "okay";
+};
+
+&route_rgb {
+	status = "okay";
+	logo,uboot = "logo.bmp";
+	logo,kernel = "logo_kernel.bmp";
+	logo,mode = "center";
+	charge_logo,mode = "center";
+	connect = <&vop_out_rgb>;
+};
+
+
+&rgb {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&lcdc_ctl>;
+
+	ports {
+		port@1 {
+			reg = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			rgb_out_panel: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&panel_in_rgb>;
+			};
+		};
+	};
+};
+
+&vop{
+	status = "okay";
+};
+
+&vop_mmu{
+	status = "okay";
+};
+
 &i2c1 {
 
 	gc4663: gc4663@29 {
@@ -89,35 +191,62 @@
 		rockchip,camera-module-lens-name = "28IRC-4M-F22-v1.0x23";
 
 		port {
-			gc4663_out: endpoint {
+			mipi_out_ucam0: endpoint {
 				remote-endpoint = <&mipi_in_ucam0>;
 				data-lanes = <1 2>;
 			};
 		};
 	};
 
-	imx219: imx219@10 {
-		compatible = "sony,imx219";
+	// imx219: imx219@10 {
+	// 	compatible = "sony,imx219";
+	// 	reg = <0x10>;
+	// 	clocks = <&cru CLK_MIPICSI_OUT>;
+	// 	clock-names = "xvclk";
+	// 	power-domains = <&power RV1126_PD_VI>;
+	// 	pinctrl-names = "rockchip,camera_default";
+	// 	pinctrl-0 = <&mipicsi_clk1>;
+	// 	avdd-supply = <&vcc3v3_sys>;
+	// 	dovdd-supply = <&vcc3v3_sys>;
+	// 	dvdd-supply = <&vcc3v3_sys>;
+	// 	// reset-gpios = <&gpio1 RK_PD5 GPIO_ACTIVE_HIGH>;
+	// 	pwd-gpios = <&gpio2 RK_PA1 GPIO_ACTIVE_HIGH>;
+	// 	rockchip,camera-module-index = <1>;
+	// 	rockchip,camera-module-facing = "front";
+	// 	rockchip,camera-module-name = "YT10092";
+	// 	rockchip,camera-module-lens-name = "IR0147-28IRC-8M-F20";
+
+	// 	port {
+	// 		mipi_out_ucam1: endpoint {
+	// 			remote-endpoint = <&mipi_in_ucam1>;
+	// 			data-lanes = <1 2>;
+	// 		};
+	// 	};
+	// };
+
+	gc4663_2: gc4663_2@10 {
 		reg = <0x10>;
-		clocks = <&cru CLK_MIPICSI_OUT>;
+		compatible = "galaxycore,gc4663";
+		rockchip,camera-module-index = <2>;
+		rockchip,camera-module-facing = "back";
 		clock-names = "xvclk";
-		power-domains = <&power RV1126_PD_VI>;
 		pinctrl-names = "rockchip,camera_default";
+
 		pinctrl-0 = <&mipicsi_clk1>;
-		avdd-supply = <&vcc3v3_sys>;
-		dovdd-supply = <&vcc3v3_sys>;
+	
+		power-domains = <&power RV1126_PD_VI>;
 		dvdd-supply = <&vcc3v3_sys>;
-		// reset-gpios = <&gpio1 RK_PD5 GPIO_ACTIVE_HIGH>;
-		// pwd-gpios = <&gpio2 RK_PA1 GPIO_ACTIVE_HIGH>;
-		rockchip,camera-module-index = <1>;
-		rockchip,camera-module-facing = "front";
-		rockchip,camera-module-name = "YT10092";
-		rockchip,camera-module-lens-name = "IR0147-28IRC-8M-F20";
+		dovdd-supply = <&vcc3v3_sys>;
+		avdd-supply = <&vcc3v3_sys>;
+		clocks = <&cru CLK_MIPICSI_OUT>;
+		reset-gpios = <&gpio1 RK_PD5 GPIO_ACTIVE_HIGH>;
+		rockchip,camera-module-name = "TRC-2232A6";
+		rockchip,camera-module-lens-name = "28IRC-4M-F22-v1.0x23";
 
 		port {
-			imx219_out0: endpoint {
+			mipi_out_ucam1: endpoint {
 				remote-endpoint = <&mipi_in_ucam1>;
-				data-lanes = <1 2 3 4>;
+				data-lanes = <1 2>;
 			};
 		};
 	};
@@ -136,7 +265,7 @@
 			mipi_in_ucam0: endpoint@1 {
 				reg = <1>;
 				// The port name of the sensor
-				remote-endpoint = <&gc4663_out>;
+				remote-endpoint = <&mipi_out_ucam0>;
 				// mipi lane number，1lane is <1>, 4lane is <1 2 3 4>
 				data-lanes = <1 2>;
 			};
@@ -166,9 +295,9 @@
 			mipi_in_ucam1: endpoint@1 {
 				reg = <1>;
 				// The port name of the sensor
-				remote-endpoint = <&imx219_out0>;
+				remote-endpoint = <&mipi_out_ucam1>;
 				// mipi lane number，1lane is <1>, 4lane is <1 2 3 4>
-				data-lanes = <1 2 3 4>;
+				data-lanes = <1 2>;
 			};
 		};
 		port@1 {
@@ -227,6 +356,7 @@
 
 &rkisp_vir1 {
 	status = "okay";
+	wait-line = <720>;
 	ports {
 		#address-cells = <1>;
 		#size-cells = <0>;
@@ -281,6 +411,7 @@
 
 &rkispp_vir1 {
 	status = "okay";
+	wait-line = <1280>;
 	port {
 		#address-cells = <1>;
 		#size-cells = <0>;
