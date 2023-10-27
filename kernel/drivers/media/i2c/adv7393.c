@@ -133,7 +133,8 @@ static const struct adv7393_std_info stdinfo[] = {
 		SD_STD_NTSC, 705268427, V4L2_STD_NTSC_443,
 	}, {
 		/* FSC(Hz) = 3,579,545.45 Hz */
-		SD_STD_NTSC, 569408542, V4L2_STD_NTSC,
+		//SD_STD_NTSC, 569408542, V4L2_STD_NTSC,
+		SD_STD_NTSC, 614961225, V4L2_STD_NTSC, // 3579545.45/25000000 * 4294967296
 	}, {
 		/* FSC(Hz) = 3,575,611.00 Hz */
 		SD_STD_PAL_M, 568782678, V4L2_STD_PAL_M,
@@ -248,7 +249,7 @@ static int adv7393_setoutput(struct v4l2_subdev *sd, u32 output_type)
 	val = state->reg00 & 0x03;
 
 	if (output_type == ADV7393_COMPOSITE_ID)
-		val |= ADV7393_COMPOSITE_POWER_VALUE;
+		val |= ADV7393_COMPONENT_POWER_VALUE;
 	else if (output_type == ADV7393_COMPONENT_ID)
 		val |= ADV7393_COMPONENT_POWER_VALUE;
 	else
