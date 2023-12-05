@@ -207,6 +207,8 @@ function usagerootfs()
 			;;
 		debian)
 			;;
+		ubuntu)
+			;;
 		distro)
 			;;
 		*)
@@ -260,6 +262,7 @@ function usage()
 	echo "multi-npu_boot     -build boot image for multi-npu board"
 	echo "yocto              -build yocto rootfs"
 	echo "debian             -build debian rootfs"
+	echo "ubuntu             -build ubuntu rootfs"
 	echo "distro             -build distro rootfs"
     echo "openwrt            -build openwrt rootfs"
 	echo "pcba               -build pcba"
@@ -827,7 +830,7 @@ function build_debian(){
 
 	cd debian
 	if [ ! -e linaro-$RK_DEBIAN_VERSON-$ARCH.tar.gz ]; then
-		RELEASE=$RK_DEBIAN_VERSION TARGET=desktop ARCH=$ARCH ./mk-base-debian.sh
+		RELEASE=$RK_DEBIAN_VERSION TARGET=desktop ARCH=$ARCH ./mk-debian.sh
 		ln -rsf linaro-$RK_DEBIAN_VERSION-alip-*.tar.gz linaro-$RK_DEBIAN_VERSION-$ARCH.tar.gz
 	fi
 
@@ -839,6 +842,29 @@ function build_debian(){
 		echo "====Build Debian ok!===="
 	else
 		echo "====Build Debian failed!===="
+		exit 1
+	fi
+	finish_build
+}
+
+function build_ubuntu(){
+	ARCH=${RK_DEBIAN_ARCH:-${RK_ARCH}}
+	case $ARCH in
+		arm|armhf) ARCH=armhf ;;
+		*) ARCH=arm64 ;;
+	esac
+
+	echo "=========Start building ubuntu for $ARCH========="
+
+	cd ubuntu
+	./mk-ubuntu-rootfs.sh
+
+	# ./mk-image.sh
+	cd ..
+	if [ $? -eq 0 ]; then
+		echo "====Build Ubuntu ok!===="
+	else
+		echo "====Build Ubuntu failed!===="
 		exit 1
 	fi
 	finish_build
@@ -896,6 +922,10 @@ function build_rootfs(){
 		debian)
 			build_debian
 			ROOTFS_IMG=debian/linaro-rootfs.img
+			;;
+		ubuntu)
+			build_ubuntu
+			ROOTFS_IMG=ubuntu/rootfs.img
 			;;
 		distro)
 			build_distro
@@ -1502,7 +1532,7 @@ for option in ${OPTIONS}; do
 		kerneldeb) build_kerneldeb ;;
 		modules) build_modules ;;
 		rootfs_inst_mods) build_rootfs_install_modules ;;
-		rootfs|buildroot|debian|distro|yocto|openwrt) build_rootfs $option ;;
+		rootfs|buildroot|debian|ubuntu|distro|yocto|openwrt) build_rootfs $option ;;
 		pcba) build_pcba ;;
 		ramboot) build_ramboot ;;
 		recovery) build_recovery ;;

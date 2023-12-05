@@ -40,3 +40,6 @@ u-boot/scripts/dtc/dtc
 u-boot/scripts/kconfig/conf
 
 tools/linux/Linux_Upgrade_Tool/Linux_Upgrade_Tool/log/
+
+ubuntu/dl
+ubuntu/rootfs.img

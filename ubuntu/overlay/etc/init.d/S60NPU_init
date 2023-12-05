@@ -1,0 +1,33 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          npu-init
+# Required-Start:    $all
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:
+# Short-Description: NPU Init
+### END INIT INFO
+
+case "$1" in
+	start)
+		printf "insmod NPU modules: "
+		cp /usr/lib/cl_*.h /tmp/
+		insmod /lib/modules/galcore.ko contiguousSize=0x400000
+		unset MAX_FREQ
+		read  MAX_FREQ < /sys/class/devfreq/ffbc0000.npu/max_freq
+		echo  $MAX_FREQ > /sys/class/devfreq/ffbc0000.npu/userspace/set_freq
+		[ $? = 0 ] && echo "OK" || echo "FAIL"
+		start_rknn.sh &
+		;;
+	stop)
+		;;
+	restart|reload)
+		$0 stop
+		$0 start
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart}"
+		exit 1
+esac
+exit 0
