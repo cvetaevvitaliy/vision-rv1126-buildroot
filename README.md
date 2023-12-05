@@ -163,6 +163,17 @@ make savedefconfig
 ```
 
 
+# How to build Ubuntu 20.04 rootfs
+
+```shell
+./build.sh device/rockchip/rv1126_rv1109/vision-rv1126-ubuntu.mk
+./build.sh uboot
+./build.sh kernel
+./build.sh ubuntu
+./build.sh recovery
+```
+
+
 # How to flash
 
 `upgrade_tool` stored in folder `tools/linux/Linux_Upgrade_Tool/Linux_Upgrade_Tool/upgrade_tool`
@@ -203,6 +214,12 @@ Quickly press CTRL+C while the device reboots until the uboot terminal appears
 ```shell
 # Activate usb device as bridge to write new buildroot to mmc
 rockusb 0 mmc 0
+```
+
+# Activate bootloader via linux
+```shell
+# For reboot to bootloader mode from linux need to execute command 
+reboot bootloader
 ```
 
 Upgrade the whole update.img firmware after packaging:
