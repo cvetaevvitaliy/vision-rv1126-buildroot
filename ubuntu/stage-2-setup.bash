@@ -8,7 +8,7 @@ ROOT_PASSWD="123qwe"
 
 NAME="vision"
 DOMAIN_NAME="com"
-HOST=${NAME}-board
+HOST_NAME=${NAME}-board
 
 cat /etc/os-release
 uname -a
@@ -50,7 +50,7 @@ echo "--------------------------------------------"
 apt-get install -y sudo systemd autoconf bash-completion \
     ssh build-essential kmod socat ifupdown ethtool iputils-ping net-tools rsyslog \
     gcc g++ iproute2 iputils-ping dhcpcd5 incron ser2net udev systemd htop dialog \
-    vim cmake make util-linux apt-utils git strace gdb libiio-dev iiod
+    vim cmake make util-linux apt-utils git strace gdb libiio-dev iiod neofetch
 
 # apt-get install -y systemd sudo dialog bash-completion gcc build-essential cmake ifupdown net-tools apt-utils
 
@@ -71,12 +71,12 @@ EOF
 
 
 echo "Configuring hostname"
-echo "${HOST}" > /etc/hostname
+echo "$HOST_NAME" > /etc/hostname
 
-echo "Setting up /etc/hosts"
+echo "Setting up "$HOST_NAME" to /etc/hosts"
 cat - >/etc/hosts <<'EOF'
 127.0.0.1       localhost
-127.0.1.1       $HOST.$DOMAIN_NAME $HOST
+127.0.1.1       $HOST_NAME.$DOMAIN_NAME $HOST_NAME
 
 # The following lines are desirable for IPv6 capable hosts
 ::1     localhost ip6-localhost ip6-loopback
