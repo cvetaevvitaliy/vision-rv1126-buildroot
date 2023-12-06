@@ -54,10 +54,10 @@ create_rootfs() {
 
 unpack_rootfs() {
         echo "unpack rootfs..."
-        sudo mkdir -p ${MOUNT_PATH}
-        sudo mount ${COMMON_DIR}/${IMAGE_FILENAME} ${MOUNT_PATH}
+        sudo -S mkdir -p ${MOUNT_PATH}
+        sudo -S mount ${COMMON_DIR}/${IMAGE_FILENAME} ${MOUNT_PATH}
 
-        sudo tar xzpf "${COMMON_DIR}/dl/${ROOTFS_NAME}" -C ${MOUNT_PATH} || { exit 1 ; }
+        sudo -S tar xzpf "${COMMON_DIR}/dl/${ROOTFS_NAME}" -C ${MOUNT_PATH} || { exit 1 ; }
         sync
         case "$?" in
                 0) echo "Sync OK"  ;;
@@ -67,7 +67,7 @@ unpack_rootfs() {
 
 umount_rootfs() {
         echo umount
-        sudo umount ${MOUNT_PATH}
+        sudo -S umount ${MOUNT_PATH}
 }
 
 
@@ -79,45 +79,45 @@ prepare_distributive() {
                 exit 1
         fi
 
-        sudo cp -b /etc/resolv.conf ${MOUNT_PATH}/etc/resolv.conf
+        sudo -S cp -b /etc/resolv.conf ${MOUNT_PATH}/etc/resolv.conf
 
-        sudo cp /usr/bin/qemu-aarch64-static ${MOUNT_PATH}/usr/bin/
+        sudo -S cp /usr/bin/qemu-aarch64-static ${MOUNT_PATH}/usr/bin/
 
         echo "Mounting proc, dev and sys"
-        sudo mount -o bind,ro /dev ${MOUNT_PATH}/dev
-        sudo mount -o bind,ro /dev/pts ${MOUNT_PATH}/dev/pts
-        sudo mount -t proc none ${MOUNT_PATH}/proc
-        sudo mount -t sysfs none ${MOUNT_PATH}/sys
+        sudo -S mount -o bind,ro /dev ${MOUNT_PATH}/dev
+        sudo -S mount -o bind,ro /dev/pts ${MOUNT_PATH}/dev/pts
+        sudo -S mount -t proc none ${MOUNT_PATH}/proc
+        sudo -S mount -t sysfs none ${MOUNT_PATH}/sys
 
         echo "Copy overlay FS"
-        sudo cp -r ${COMMON_DIR}/overlay/* ${MOUNT_PATH}/
+        sudo -S cp -r ${COMMON_DIR}/overlay/* ${MOUNT_PATH}/
 
         echo "Kernel modules"
-        sudo cp -r ${KERNEL_MODULES}/lib/* ${MOUNT_PATH}/usr/lib/
+        sudo -S cp -r ${KERNEL_MODULES}/lib/* ${MOUNT_PATH}/usr/lib/
 
         if [ -a ${MOUNT_PATH}/root/.bashrc ]; then
                 echo "Create backup .bashrc"
-                sudo cp ${MOUNT_PATH}/root/.bashrc ${MOUNT_PATH}/root/bashrc.bak
+                sudo -S cp ${MOUNT_PATH}/root/.bashrc ${MOUNT_PATH}/root/bashrc.bak
         fi
 
-        sudo cp ${COMMON_DIR}/stage-2-setup.bash ${MOUNT_PATH}/root/.bashrc
+        sudo -S cp ${COMMON_DIR}/stage-2-setup.bash ${MOUNT_PATH}/root/.bashrc
 
-        sudo chroot ${MOUNT_PATH}/
+        sudo -S chroot ${MOUNT_PATH}/
 
-        sudo rm ${MOUNT_PATH}/root/.bashrc
+        sudo -S rm ${MOUNT_PATH}/root/.bashrc
 
         echo "Removing stage 2 script"
         if [ -a ${MOUNT_PATH}/root/bashrc.bak ]; then
                 echo "Restore backup .bashrc"
-                sudo mv ${MOUNT_PATH}/root/bashrc.bak ${MOUNT_PATH}/root/.bashrc
+                sudo -S mv ${MOUNT_PATH}/root/bashrc.bak ${MOUNT_PATH}/root/.bashrc
         fi
 
         sync
 
-        sudo umount ${MOUNT_PATH}/dev/pts
-        sudo umount ${MOUNT_PATH}/dev
-        sudo umount ${MOUNT_PATH}/proc
-        sudo umount ${MOUNT_PATH}/sys
+        sudo -S umount ${MOUNT_PATH}/dev/pts
+        sudo -S umount ${MOUNT_PATH}/dev
+        sudo -S umount ${MOUNT_PATH}/proc
+        sudo -S umount ${MOUNT_PATH}/sys
 
 }
 
