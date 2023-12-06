@@ -9,6 +9,8 @@ IMAGE_FILENAME="rootfs.img"
 
 MOUNT_PATH="/tmp/ubuntu_rootfs"
 
+SUDO_ASKPASS=password.sh
+
 
 # if [ -h $0 ]
 # then
