@@ -9,7 +9,7 @@ IMAGE_FILENAME="rootfs.img"
 
 MOUNT_PATH="/tmp/ubuntu_rootfs"
 
-SUDO_ASKPASS=password.sh
+SUDO_ASKPASS=${COMMON_DIR}/password.sh
 
 
 # if [ -h $0 ]
