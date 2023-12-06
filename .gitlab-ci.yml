@@ -19,7 +19,7 @@
 stages:          # List of stages for jobs, and their order of execution
   - build
 
-build-job:       # This job runs in the build stage, which runs first.
+build-buildroot:       # This job runs in the build stage, which runs first.
   stage: build
   script:
     - echo "Prepare environment for build ..."
@@ -57,5 +57,41 @@ build-job:       # This job runs in the build stage, which runs first.
       paths:
         - artifacts/*
         - artifacts_sdk/*
-      expire_in: 2 week    
+      expire_in: 2 week   
+
+build-ubuntu:       # This job runs in the build stage, which runs first.
+  stage: build
+  script:
+    - echo "Prepare environment for build ..."
+    - bash build.sh device/rockchip/rv1126_rv1109/vision-rv1126-ubuntu.mk
+    - bash build.sh cleanall
+    - bash build.sh device/rockchip/rv1126_rv1109/vision-rv1126-ubuntu.mk
+
+    - echo "Start Build u-boot... "
+    - bash build.sh uboot
+
+    - echo "Start Build kernel... "
+    - bash build.sh kernel
+
+    - echo "Start Build buildroot... "
+    - bash build.sh ubuntu
+
+    - echo "Start Build recovery... "
+    - bash build.sh recovery
+
+    - echo "Prepare images... "
+    - bash mkfirmware.sh ubuntu
+
+    - echo "Prepare update image... "
+    - bash build.sh updateimg
+
+    - mkdir -p artifacts
+    - cp -L -r rockdev/* artifacts/
+
+    - echo "Compile complete. All jobs done"
+
+  artifacts:
+      paths:
+        - artifacts/*
+      expire_in: 2 week        
 
