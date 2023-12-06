@@ -9,7 +9,8 @@ IMAGE_FILENAME="rootfs.img"
 
 MOUNT_PATH="/tmp/ubuntu_rootfs"
 
-SUDO_ASKPASS=${COMMON_DIR}/password.sh
+chmod 500 ${COMMON_DIR}/password.sh
+export SUDO_ASKPASS=${COMMON_DIR}/password.sh
 
 
 # if [ -h $0 ]
@@ -54,10 +55,10 @@ create_rootfs() {
 
 unpack_rootfs() {
         echo "unpack rootfs..."
-        sudo -S mkdir -p ${MOUNT_PATH}
-        sudo -S mount ${COMMON_DIR}/${IMAGE_FILENAME} ${MOUNT_PATH}
+        sudo -A mkdir -p ${MOUNT_PATH}
+        sudo -A mount ${COMMON_DIR}/${IMAGE_FILENAME} ${MOUNT_PATH}
 
-        sudo -S tar xzpf "${COMMON_DIR}/dl/${ROOTFS_NAME}" -C ${MOUNT_PATH} || { exit 1 ; }
+        sudo -A tar xzpf "${COMMON_DIR}/dl/${ROOTFS_NAME}" -C ${MOUNT_PATH} || { exit 1 ; }
         sync
         case "$?" in
                 0) echo "Sync OK"  ;;
@@ -67,7 +68,7 @@ unpack_rootfs() {
 
 umount_rootfs() {
         echo umount
-        sudo -S umount ${MOUNT_PATH}
+        sudo -A umount ${MOUNT_PATH}
 }
 
 
@@ -79,45 +80,45 @@ prepare_distributive() {
                 exit 1
         fi
 
-        sudo -S cp -b /etc/resolv.conf ${MOUNT_PATH}/etc/resolv.conf
+        sudo -A cp -b /etc/resolv.conf ${MOUNT_PATH}/etc/resolv.conf
 
-        sudo -S cp /usr/bin/qemu-aarch64-static ${MOUNT_PATH}/usr/bin/
+        sudo -A cp /usr/bin/qemu-aarch64-static ${MOUNT_PATH}/usr/bin/
 
         echo "Mounting proc, dev and sys"
-        sudo -S mount -o bind,ro /dev ${MOUNT_PATH}/dev
-        sudo -S mount -o bind,ro /dev/pts ${MOUNT_PATH}/dev/pts
-        sudo -S mount -t proc none ${MOUNT_PATH}/proc
-        sudo -S mount -t sysfs none ${MOUNT_PATH}/sys
+        sudo -A mount -o bind,ro /dev ${MOUNT_PATH}/dev
+        sudo -A mount -o bind,ro /dev/pts ${MOUNT_PATH}/dev/pts
+        sudo -A mount -t proc none ${MOUNT_PATH}/proc
+        sudo -A mount -t sysfs none ${MOUNT_PATH}/sys
 
         echo "Copy overlay FS"
-        sudo -S cp -r ${COMMON_DIR}/overlay/* ${MOUNT_PATH}/
+        sudo -A cp -r ${COMMON_DIR}/overlay/* ${MOUNT_PATH}/
 
         echo "Kernel modules"
-        sudo -S cp -r ${KERNEL_MODULES}/lib/* ${MOUNT_PATH}/usr/lib/
+        sudo -A cp -r ${KERNEL_MODULES}/lib/* ${MOUNT_PATH}/usr/lib/
 
         if [ -a ${MOUNT_PATH}/root/.bashrc ]; then
                 echo "Create backup .bashrc"
-                sudo -S cp ${MOUNT_PATH}/root/.bashrc ${MOUNT_PATH}/root/bashrc.bak
+                sudo -A cp ${MOUNT_PATH}/root/.bashrc ${MOUNT_PATH}/root/bashrc.bak
         fi
 
-        sudo -S cp ${COMMON_DIR}/stage-2-setup.bash ${MOUNT_PATH}/root/.bashrc
+        sudo -A cp ${COMMON_DIR}/stage-2-setup.bash ${MOUNT_PATH}/root/.bashrc
 
-        sudo -S chroot ${MOUNT_PATH}/
+        sudo -A chroot ${MOUNT_PATH}/
 
-        sudo -S rm ${MOUNT_PATH}/root/.bashrc
+        sudo -A rm ${MOUNT_PATH}/root/.bashrc
 
         echo "Removing stage 2 script"
         if [ -a ${MOUNT_PATH}/root/bashrc.bak ]; then
                 echo "Restore backup .bashrc"
-                sudo -S mv ${MOUNT_PATH}/root/bashrc.bak ${MOUNT_PATH}/root/.bashrc
+                sudo -A mv ${MOUNT_PATH}/root/bashrc.bak ${MOUNT_PATH}/root/.bashrc
         fi
 
         sync
 
-        sudo -S umount ${MOUNT_PATH}/dev/pts
-        sudo -S umount ${MOUNT_PATH}/dev
-        sudo -S umount ${MOUNT_PATH}/proc
-        sudo -S umount ${MOUNT_PATH}/sys
+        sudo -A umount ${MOUNT_PATH}/dev/pts
+        sudo -A umount ${MOUNT_PATH}/dev
+        sudo -A umount ${MOUNT_PATH}/proc
+        sudo -A umount ${MOUNT_PATH}/sys
 
 }
 

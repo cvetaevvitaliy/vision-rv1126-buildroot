@@ -1,2 +1,2 @@
 #!/bin/bash
-echo 123qwe
+echo '123qwe'
