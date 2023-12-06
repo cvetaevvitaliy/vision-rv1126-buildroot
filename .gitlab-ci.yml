@@ -19,45 +19,45 @@
 stages:          # List of stages for jobs, and their order of execution
   - build
 
-# build-buildroot:       # This job runs in the build stage, which runs first.
-#   stage: build
-#   script:
-#     - echo "Prepare environment for build ..."
-#     - bash build.sh device/rockchip/rv1126_rv1109/vision-rv1126.mk
-#     - bash build.sh cleanall
-#     - bash build.sh device/rockchip/rv1126_rv1109/vision-rv1126.mk
+build-buildroot:       # This job runs in the build stage, which runs first.
+  stage: build
+  script:
+    - echo "Prepare environment for build ..."
+    - bash build.sh device/rockchip/rv1126_rv1109/vision-rv1126.mk
+    - bash build.sh cleanall
+    - bash build.sh device/rockchip/rv1126_rv1109/vision-rv1126.mk
 
-#     - echo "Start Build u-boot... "
-#     - bash build.sh uboot
+    - echo "Start Build u-boot... "
+    - bash build.sh uboot
 
-#     - echo "Start Build kernel... "
-#     - bash build.sh kernel
+    - echo "Start Build kernel... "
+    - bash build.sh kernel
 
-#     - echo "Start Build buildroot... "
-#     - bash build.sh rootfs
+    - echo "Start Build buildroot... "
+    - bash build.sh rootfs
 
-#     - echo "Start Build recovery... "
-#     - bash build.sh recovery
+    - echo "Start Build recovery... "
+    - bash build.sh recovery
 
-#     - echo "Prepare images... "
-#     - bash mkfirmware.sh
+    - echo "Prepare images... "
+    - bash mkfirmware.sh
 
-#     - echo "Prepare update image... "
-#     - bash build.sh updateimg
+    - echo "Prepare update image... "
+    - bash build.sh updateimg
 
-#     - mkdir -p artifacts
-#     - cp -L -r rockdev/* artifacts/
+    - mkdir -p artifacts
+    - cp -L -r rockdev/* artifacts/
 
-#     - mkdir -p artifacts_sdk/
-#     - cp -L rockdev_sdk/vision-sdk.tar.gz artifacts_sdk/
+    - mkdir -p artifacts_sdk/
+    - cp -L rockdev_sdk/vision-sdk.tar.gz artifacts_sdk/
 
-#     - echo "Compile complete. All jobs done"
+    - echo "Compile complete. All jobs done"
 
-#   artifacts:
-#       paths:
-#         - artifacts/*
-#         - artifacts_sdk/*
-#       expire_in: 2 week   
+  artifacts:
+      paths:
+        - artifacts/*
+        - artifacts_sdk/*
+      expire_in: 2 week   
 
 build-ubuntu:       # This job runs in the build stage, which runs first.
   stage: build
@@ -73,7 +73,7 @@ build-ubuntu:       # This job runs in the build stage, which runs first.
     - echo "Start Build kernel... "
     - bash build.sh kernel
 
-    - echo "Start Build buildroot... "
+    - echo "Start Build Ubuntu rootfs... "
     - bash build.sh ubuntu
 
     - echo "Start Build recovery... "
@@ -86,7 +86,7 @@ build-ubuntu:       # This job runs in the build stage, which runs first.
     - bash build.sh updateimg
 
     - mkdir -p artifacts
-    - cp -L -r rockdev/* artifacts/
+    - cp -L -r rockdev/pack/* artifacts/
 
     - echo "Compile complete. All jobs done"
 

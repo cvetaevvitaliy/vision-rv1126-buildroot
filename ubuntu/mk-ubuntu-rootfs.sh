@@ -75,6 +75,7 @@ prepare_distributive() {
                 exit 1
         fi
 
+        echo "=== STAGE 1 START ==="
         sudo -A cp -b /etc/resolv.conf ${MOUNT_PATH}/etc/resolv.conf
 
         sudo -A cp /usr/bin/qemu-aarch64-static ${MOUNT_PATH}/usr/bin/
@@ -114,6 +115,8 @@ prepare_distributive() {
         sudo -A umount ${MOUNT_PATH}/dev
         sudo -A umount ${MOUNT_PATH}/proc
         sudo -A umount ${MOUNT_PATH}/sys
+
+        echo "=== STAGE 1 SUCCESSFULLY REACHED THE END ==="
 
 }
 

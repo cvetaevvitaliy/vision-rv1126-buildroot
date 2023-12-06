@@ -68,14 +68,15 @@ post-down ifconfig usb0 down
 EOF
 
 
-echo "Configuring networking"
-firewall-cmd --add-port=43/tcp --permanent
-firewall-cmd --add-port=53/tcp --permanent
-firewall-cmd --reload
-echo "--------------------------------------------"
+# echo "Configuring networking"
+# firewall-cmd --add-port=43/tcp --permanent
+# firewall-cmd --add-port=53/tcp --permanent
+# firewall-cmd --reload
+# echo "--------------------------------------------"
 
 
-echo "Configuring UFW Firewall"
+# echo "Configuring UFW Firewall"
+
 echo "$HOST_NAME" > /etc/hostname
 
 echo "Setting up "$HOST_NAME" to /etc/hosts"
