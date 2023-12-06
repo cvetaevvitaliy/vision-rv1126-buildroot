@@ -5,6 +5,34 @@ set -e
 SCRIPT_DIR=$(dirname $(realpath $BASH_SOURCE))
 TOP_DIR=$(realpath $SCRIPT_DIR/../../..)
 cd $TOP_DIR
+MKIMAGE=$SCRIPT_DIR/mk-image.sh
+ROCKDEV=$TOP_DIR/rockdev
+OEM_FAKEROOT_SCRIPT=$ROCKDEV/oem.fs
+
+function build_oem()
+{
+	echo "build_oem"
+	if [ -d "$OEM_DIR" ]
+	then
+		echo "#!/bin/sh" > $OEM_FAKEROOT_SCRIPT
+		echo "set -e" >> $OEM_FAKEROOT_SCRIPT
+		if [ -d $OEM_DIR/www ]; then
+			echo "chown -R www-data:www-data $OEM_DIR/www" >> $OEM_FAKEROOT_SCRIPT
+		fi
+		if [ "$RK_OEM_FS_TYPE" = "ubi" ]; then
+			echo "$MKIMAGE $OEM_DIR $ROCKDEV/oem.img $RK_OEM_FS_TYPE ${RK_OEM_PARTITION_SIZE:-$oem_part_size_bytes} oem $RK_UBI_PAGE_SIZE $RK_UBI_BLOCK_SIZE"  >> $OEM_FAKEROOT_SCRIPT
+		else
+			echo "$MKIMAGE $OEM_DIR $ROCKDEV/oem.img $RK_OEM_FS_TYPE"  >> $OEM_FAKEROOT_SCRIPT
+		fi
+		chmod a+x $OEM_FAKEROOT_SCRIPT
+		FAKEROOT_TOOL="`which fakeroot`"
+		$FAKEROOT_TOOL -- $OEM_FAKEROOT_SCRIPT
+		rm -f $OEM_FAKEROOT_SCRIPT
+		ls -l $ROCKDEV/oem.img
+	else
+		echo "warning: $OEM_DIR  not found!"
+	fi
+}
 
 function unset_board_config_all()
 {
@@ -39,6 +67,7 @@ if [ $1 = ubuntu ]
 then
 # ROOTFS_IMG=$TOP_DIR/ubuntu/rootfs.img
 ROOTFS_IMG_SOURCE=$TOP_DIR/ubuntu/rootfs.img
+build_oem
 else
 echo "Error"
 exit 0
@@ -250,6 +279,8 @@ then
 	fi
 fi
 
+if [ $1 != ubuntu ]
+then
 if [ "${RK_OEM_BUILDIN_BUILDROOT}x" != "YESx" ]
 then
 	if [ -d "$OEM_DIR" ]
@@ -274,6 +305,7 @@ else
 	if [ -f "$TOP_DIR/buildroot/output/$RK_CFG_BUILDROOT/images/oem.img" ]; then
 		ln -sfr $TOP_DIR/buildroot/output/$RK_CFG_BUILDROOT/images/oem.img $ROCKDEV/oem.img
 	fi
+fi
 fi
 
 if [ $RK_USERDATA_DIR ]

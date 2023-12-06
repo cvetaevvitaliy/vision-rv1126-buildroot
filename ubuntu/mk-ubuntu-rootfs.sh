@@ -9,16 +9,11 @@ IMAGE_FILENAME="rootfs.img"
 
 MOUNT_PATH="/tmp/ubuntu_rootfs"
 
-chmod 500 ${COMMON_DIR}/password.sh
-export SUDO_ASKPASS=${COMMON_DIR}/password.sh
-
-
-# if [ -h $0 ]
-# then
-#         CMD=$(readlink $0)
-#         COMMON_DIR=$(dirname $CMD)
-# fi
-
+# need sudo password for build with CI/CD
+if ! [ -f "~/password.sh" ]; then
+        chmod 500 ~/password.sh
+        export SUDO_ASKPASS=~/password.sh
+fi
 
 
 download_rootfs() {
