@@ -1,5 +1,7 @@
 #!/bin/bash
 IFS=$'\n\t'
+COMMON_DIR=$(cd `dirname $0`; pwd)
+KERNEL_MODULES=${COMMON_DIR}/../deploy/modules
 
 UBUNTU_ROOTFS_LINK="https://cdimage.ubuntu.com/ubuntu-base/releases/20.04.5/release"
 ROOTFS_NAME="ubuntu-base-20.04.2-base-armhf.tar.gz"
@@ -7,7 +9,7 @@ IMAGE_FILENAME="rootfs.img"
 
 MOUNT_PATH="/tmp/ubuntu_rootfs"
 
-COMMON_DIR=$(cd `dirname $0`; pwd)
+
 # if [ -h $0 ]
 # then
 #         CMD=$(readlink $0)
@@ -85,29 +87,28 @@ prepare_distributive() {
         sudo mount -t proc none ${MOUNT_PATH}/proc
         sudo mount -t sysfs none ${MOUNT_PATH}/sys
 
+        echo "Copy overlay FS"
         sudo cp -r ${COMMON_DIR}/overlay/* ${MOUNT_PATH}/
+
+        echo "Kernel modules"
+        sudo cp -r ${KERNEL_MODULES}/lib/* ${MOUNT_PATH}/usr/lib/
 
         if [ -a ${MOUNT_PATH}/root/.bashrc ]; then
                 echo "Create backup .bashrc"
-                sudo cp ${MOUNT_PATH}/root/.bashrc ${MOUNT_PATH}/root/.bashrc.bak
+                sudo cp ${MOUNT_PATH}/root/.bashrc ${MOUNT_PATH}/root/bashrc.bak
         fi
 
         sudo cp ${COMMON_DIR}/stage-2-setup.bash ${MOUNT_PATH}/root/.bashrc
-
-        sudo cp ${COMMON_DIR}/stage-2-setup.bash ${MOUNT_PATH}/root/stage-2-setup.bash
 
         sudo chroot ${MOUNT_PATH}/
 
         sudo rm ${MOUNT_PATH}/root/.bashrc
 
-        if [ -a ${MOUNT_PATH}/root/.bashrc.bak ]; then
-                echo "Restore backup .bashrc"
-                sudo mv ${MOUNT_PATH}/root/.bashrc.bak ${MOUNT_PATH}/root/.bashrc
-        fi
-
         echo "Removing stage 2 script"
-	sudo rm ${MOUNT_PATH}/root/stage-2-setup.bash
-
+        if [ -a ${MOUNT_PATH}/root/bashrc.bak ]; then
+                echo "Restore backup .bashrc"
+                sudo mv ${MOUNT_PATH}/root/bashrc.bak ${MOUNT_PATH}/root/.bashrc
+        fi
 
         sync
 

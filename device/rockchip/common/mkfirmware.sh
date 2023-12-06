@@ -24,12 +24,28 @@ if [ "${RK_OEM_DIR}x" != "x" ];then
 else
 	OEM_DIR=
 fi
+
 USER_DATA_DIR=$TOP_DIR/device/rockchip/userdata/$RK_USERDATA_DIR
 MISC_IMG=$TOP_DIR/device/rockchip/rockimg/$RK_MISC
 ROOTFS_IMG=$TOP_DIR/$RK_ROOTFS_IMG
 ROOTFS_IMG_SOURCE=$TOP_DIR/buildroot/output/$RK_CFG_BUILDROOT/images/rootfs.$RK_ROOTFS_TYPE
-RAMBOOT_IMG=$TOP_DIR/buildroot/output/$RK_CFG_RAMBOOT/images/ramboot.img
+
+if [ ! -n "$1" ];then
+ROOTFS_IMG=$TOP_DIR/$RK_ROOTFS_IMG
+ROOTFS_IMG_SOURCE=$TOP_DIR/buildroot/output/$RK_CFG_BUILDROOT/images/rootfs.$RK_ROOTFS_TYPE
 SDK_SOURCE_FILE=$TOP_DIR/buildroot/output/$RK_CFG_BUILDROOT/images/vision-sdk.tar.gz
+else
+if [ $1 = ubuntu ]
+then
+# ROOTFS_IMG=$TOP_DIR/ubuntu/rootfs.img
+ROOTFS_IMG_SOURCE=$TOP_DIR/ubuntu/rootfs.img
+else
+echo "Error"
+exit 0
+fi
+fi
+
+RAMBOOT_IMG=$TOP_DIR/buildroot/output/$RK_CFG_RAMBOOT/images/ramboot.img
 if [ -n "${RK_CFG_RECOVERY}" ]; then
 RECOVERY_IMG=$TOP_DIR/buildroot/output/$RK_CFG_RECOVERY/images/recovery.img
 else

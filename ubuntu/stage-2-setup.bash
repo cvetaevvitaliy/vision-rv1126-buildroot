@@ -30,6 +30,7 @@ echo "Configuring apt sources"
 # S2EOF
 
 apt-get -y update
+yes | unminimize
 apt-get -y upgrade
 
 echo "Setting timezone"
@@ -40,17 +41,14 @@ dpkg-reconfigure --frontend noninteractive tzdata
 
 echo "--------------------------------------------"
 
-
-# echo "Add user"
-# addgroup --system -gid 110 messagebus
-# adduser --system --uid 106 --gid 110 --home /var/run/dbus messagebus
-# adduser --force-badname --system --home /nonexistent --no-create-home --quiet _apt || true
+apt-get install -y sudo udev systemd ssh bash-completion kmod iproute2 ifupdown ethtool iputils-ping net-tools rsyslog dhcpcd5 bind9 \
+    ufw incron htop vim nano util-linux libiio-dev iiod neofetch
 
 
-apt-get install -y sudo systemd autoconf bash-completion \
-    ssh build-essential kmod socat ifupdown ethtool iputils-ping net-tools rsyslog \
-    gcc g++ iproute2 iputils-ping dhcpcd5 incron ser2net udev systemd htop dialog \
-    vim cmake make util-linux apt-utils git strace gdb libiio-dev iiod neofetch
+# apt-get install -y sudo systemd autoconf bash-completion \
+#     ssh build-essential kmod socat ifupdown ethtool iputils-ping net-tools rsyslog \
+#     gcc g++ iproute2 iputils-ping dhcpcd5 incron udev systemd htop dialog \
+#     vim cmake make util-linux apt-utils git strace gdb libiio-dev iiod neofetch
 
 # apt-get install -y systemd sudo dialog bash-completion gcc build-essential cmake ifupdown net-tools apt-utils
 
@@ -58,7 +56,7 @@ echo "--------------------------------------------"
 
 echo "Configuring networking"
 echo "...lo"
-cat - >>/etc/network/interaces <<EOF
+cat - >>/etc/network/interfaces <<EOF
 
 auto lo
 iface lo inet loopback
@@ -70,13 +68,20 @@ post-down ifconfig usb0 down
 EOF
 
 
-echo "Configuring hostname"
+echo "Configuring networking"
+firewall-cmd --add-port=43/tcp --permanent
+firewall-cmd --add-port=53/tcp --permanent
+firewall-cmd --reload
+echo "--------------------------------------------"
+
+
+echo "Configuring UFW Firewall"
 echo "$HOST_NAME" > /etc/hostname
 
 echo "Setting up "$HOST_NAME" to /etc/hosts"
-cat - >/etc/hosts <<'EOF'
+cat - >/etc/hosts <<EOF
 127.0.0.1       localhost
-127.0.1.1       $HOST_NAME.$DOMAIN_NAME $HOST_NAME
+127.0.1.1       ${HOST_NAME}.${DOMAIN_NAME} ${HOST_NAME}
 
 # The following lines are desirable for IPv6 capable hosts
 ::1     localhost ip6-localhost ip6-loopback

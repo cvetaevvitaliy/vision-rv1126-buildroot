@@ -20,6 +20,7 @@ MISC=$ROCKDEV_DIR/misc.img
 ROOTFS=$ROCKDEV_DIR/rootfs.img
 USERDATA=$ROCKDEV_DIR/userdata.img
 UPDATE=$ROCKDEV_DIR/update.img
+UBUNTU=$TOP_DIR/ubuntu/rootfs.img
 
 if [ ! -n "$1" ];then
 echo "flash all images as default"
@@ -40,6 +41,19 @@ then
 	$UPGRADETOOL di -oem $OEM
 	$UPGRADETOOL di -userdata $USERDATA
 	$UPGRADETOOL di -rootfs $ROOTFS
+	$UPGRADETOOL rd
+fi
+
+if [ $FLASH_TYPE = ubuntu ]
+then
+	echo "Flash ubuntu"
+	$UPGRADETOOL ul  $LOADER
+	$UPGRADETOOL di -p $PARAMETER
+	$UPGRADETOOL di -uboot $UBOOT
+	$UPGRADETOOL di -b $BOOT
+	$UPGRADETOOL di -r $RECOVERY
+	$UPGRADETOOL di -m $MISC
+	$UPGRADETOOL di -rootfs $UBUNTU
 	$UPGRADETOOL rd
 fi
 

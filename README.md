@@ -4,7 +4,7 @@
 
 #### Depends 
 
-Install dependences<br>
+Install dependencies<br>
 **for ubuntu Ubuntu 20.04*
 ```shell
 sudo apt-get install -y bison texinfo flex cmake libssl-dev liblz4-tool patchelf chrpath gawk expect-dev python2 git git-lfs expect-dev debianutils sed make binutils build-essential gcc g++ bash patch gzip bzip2 perl tar cpio unzip rsync file bc git device-tree-compiler
@@ -165,12 +165,22 @@ make savedefconfig
 
 # How to build Ubuntu 20.04 rootfs
 
+Ubuntu 20.04 is pre-prepared locally using QEMU, you need to install dependency 'qemu-user-static'
+
 ```shell
 ./build.sh device/rockchip/rv1126_rv1109/vision-rv1126-ubuntu.mk
 ./build.sh uboot
 ./build.sh kernel
 ./build.sh ubuntu
 ./build.sh recovery
+./mkfirmware.sh ubuntu
+./build.sh updateimg
+```
+
+Flash image
+
+```shell
+sudo tools/linux/Linux_Upgrade_Tool/Linux_Upgrade_Tool/upgrade_tool uf rockdev/pack/VISION-RV1126_Ubuntu_xxxxxx.img 
 ```
 
 
@@ -178,9 +188,23 @@ make savedefconfig
 
 `upgrade_tool` stored in folder `tools/linux/Linux_Upgrade_Tool/Linux_Upgrade_Tool/upgrade_tool`
 
+# How to activate bootloader via linux or see Flashing over UBOOT
 ```shell
-### In addition to MiniLoader All.bin and parameter.txt, the actual partition to
-be burned is based on rockdev / parameter.txt configuration.
+# For reboot to bootloader mode from linux need to execute command 
+reboot bootloader
+```
+
+Upgrade the whole update.img firmware after packaging:
+
+```shell
+sudo tools/linux/Linux_Upgrade_Tool/Linux_Upgrade_Tool/upgrade_tool uf rockdev/VISION-RV1126_xxxxxx.img
+```
+
+Flash different partitions
+
+```shell
+### In addition to MiniLoader All.bin and parameter.txt, the actual partition to be flshed is based on rockdev / parameter.txt configuration.
+# tools/linux/Linux_Upgrade_Tool/Linux_Upgrade_Tool/upgrade_tool
 sudo ./upgrade_tool ul rockdev/MiniLoaderAll.bin
 sudo ./upgrade_tool di -p rockdev/parameter.txt
 sudo ./upgrade_tool di -u rockdev/uboot.img
@@ -216,12 +240,6 @@ Quickly press CTRL+C while the device reboots until the uboot terminal appears
 rockusb 0 mmc 0
 ```
 
-# Activate bootloader via linux
-```shell
-# For reboot to bootloader mode from linux need to execute command 
-reboot bootloader
-```
-
 Upgrade the whole update.img firmware after packaging:
 
 ```shell
@@ -241,10 +259,5 @@ Press boot button or short off the two pads like on the picture
 
 Run upgrade utility
 
-Upgrade the whole update.img firmware after packaging:
-
-```shell
-sudo ./upgrade_tool uf rockdev/update.img
-```
 
 After successfully start of upgrading release the button

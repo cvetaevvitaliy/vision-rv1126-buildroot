@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}/bin
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: libeasymedia
+Description: Easy Media interface library
+Version: 1.0.1
+Libs: -L${libdir} -leasymedia
+Libs.private:
+Cflags: -I${includedir}
