@@ -88,16 +88,21 @@ endef
 
 define VISION_SERVICES_INSTALL_ASSETS
 	$(INSTALL) -D -m  644 $(@D)/assets/screensaver.png ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/assets/screensaver.png
+	$(INSTALL) -D -m  755 $(@D)/assets/vision ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/usr/bin/vision
 endef
 
 define VISION_SERVICES_INSTALL_SCRIPTS
 	$(INSTALL) -D -m  755 $(@D)/assets/init.d/* "${TARGET_DIR}/etc/init.d/"
+	$(INSTALL) -D -m  755 $(@D)/assets/osd_menu_nav.sh "${TARGET_DIR}/usr/bin/osd_menu_nav.sh"
 endef
 
 define VISION_SERVICES_INSTALL_AI_MODEL
 	$(INSTALL) -D -m  644 $(@D)/assets/default_model.rknn ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/ai_model/default_model.rknn
 endef
 
+define VISION_SERVICES_INSTALL_LIBS
+	$(INSTALL) -D -m  755 $(@D)/lib/bytetrack/libbytetrack.so ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/usr/lib/libbytetrack.so
+endef
 
 define VISION_SERVICES_INSTALL_FONTS
 	mkdir -p "${TARGET_DIR}/etc/displayport/"
