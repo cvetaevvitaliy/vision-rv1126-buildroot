@@ -1,5 +1,5 @@
 # <file system>			<mount pt>		<type>		<options>		<dump>	<pass>
-debug				/sys/kernel/debug	debugfs		defaults		0	0
+debug               /sys/kernel/debug   debugfs defaults    0	0
 # /dev/block/by-name/misc		/misc			emmc		defaults		0	0
-/dev/mmcblk0p7		/oem			ext2		rw,user,exec,umask=000 0 0
-/dev/mmcblk0p8      /userdata		ext2		drw,user,exec,umask=000 0 0
+/dev/mmcblk0p7      /oem        ext4    rw,user,exec 0 0
+/dev/mmcblk0p8      /userdata   ext4    rw,user,exec 0 0
