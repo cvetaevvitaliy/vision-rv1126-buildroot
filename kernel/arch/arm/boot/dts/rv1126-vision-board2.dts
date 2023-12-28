@@ -70,7 +70,13 @@
 			press-threshold-microvolt = <1477000>;
 		};
 	};
-
+	
+	hdmi_osc: hdmi-osc {
+		compatible = "fixed-clock";
+		clock-output-names = "hdmi-osc";
+		clock-frequency = <27000000>;
+		#clock-cells = <0>;
+	};
 
 };
 
@@ -158,9 +164,8 @@
 	tc358743@f {
 		compatible = "toshiba,tc358743";
 		reg = <0x0f>;
-		clocks = <&cru CLK_MIPICSI_OUT>;
-		clock-names = "xvclk";
-		pinctrl-0 = <&mipicsi_clk1>;
+		clocks = <&hdmi_osc>;
+		clock-names = "refclk";
 		// reset-gpios = <&gpio6 9 GPIO_ACTIVE_LOW>;
 		// interrupt-parent = <&gpio2>;
 		// interrupts = <5 IRQ_TYPE_LEVEL_HIGH>;
