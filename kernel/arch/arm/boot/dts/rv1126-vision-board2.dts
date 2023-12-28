@@ -17,19 +17,19 @@
 	};
 
 	leds {
-        compatible = "gpio-leds";
-        led_stat {
-            gpios = <&gpio1 RK_PB2 GPIO_ACTIVE_LOW>;
+		compatible = "gpio-leds";
+		led_stat {
+			gpios = <&gpio1 RK_PB2 GPIO_ACTIVE_LOW>;
 			label = "heartbeat";
 			default-state = "off";
 			linux,default-trigger = "heartbeat";
-        };
+		};
 		led_act {
-            gpios = <&gpio1 RK_PB3 GPIO_ACTIVE_LOW>;
-            label = "green";
-            default-state = "off";
-        };
-    };
+			gpios = <&gpio1 RK_PB3 GPIO_ACTIVE_LOW>;
+			label = "green";
+			default-state = "off";
+		};
+	};
 
 	// OSD pads for connect joystick
 	adc_keys: adc-keys
