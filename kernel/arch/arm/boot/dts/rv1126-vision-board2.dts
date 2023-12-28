@@ -166,9 +166,15 @@
 		reg = <0x0f>;
 		clocks = <&hdmi_osc>;
 		clock-names = "refclk";
+		pinctrl-names = "rockchip,camera_default";
 		// reset-gpios = <&gpio6 9 GPIO_ACTIVE_LOW>;
-		// interrupt-parent = <&gpio2>;
-		// interrupts = <5 IRQ_TYPE_LEVEL_HIGH>;
+		reset-gpios = <&gpio3 RK_PA6 GPIO_ACTIVE_HIGH>;
+		interrupt-parent = <&gpio2>;
+		interrupts = <5 IRQ_TYPE_LEVEL_HIGH>;
+		rockchip,camera-module-index = <1>;
+		rockchip,camera-module-facing = "front";
+		rockchip,camera-module-name = "TRC-2232A6";
+		rockchip,camera-module-lens-name = "28IRC-4M-F22-v1.0x23";
 
 		port {
 			tc358743_out: endpoint {
