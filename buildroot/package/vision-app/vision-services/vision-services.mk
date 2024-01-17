@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-VISION_SERVICES_VERSION = 0.0.20
+VISION_SERVICES_VERSION = c17a1fa4e99ec8df1955265839cb06d98bfc4d5b
 VISION_SERVICES_SITE = ssh://git@gitlab.hard-tech.org.ua/vision/vision-services.git
 VISION_SERVICES_SITE_METHOD = git
 VISION_SERVICES_INSTALL_STAGING = NO
@@ -128,6 +128,8 @@ endef
 define VISION_SERVICES_ENCRYPT_SERVICES
 	@echo "> Vision_security"
 	rm -rf /tmp/vision_security
+
+	cp -r $(@D)/assets/security/* "${TARGET_DIR}/"
 
 	$(foreach svc,$(VISION_SERVICES_ENCRYPT_LIST),$(call VIS_SEC_PREPARE,$(svc)))
 
