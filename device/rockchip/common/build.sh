@@ -1437,6 +1437,7 @@ if echo $@|grep -wqE "help|-h"; then
 fi
 
 OPTIONS="${@:-allff}"
+[ "$(echo -n $@)" == "-sdk" ] && OPTIONS="-sdk allff"
 
 SDK_OPTION=
 
