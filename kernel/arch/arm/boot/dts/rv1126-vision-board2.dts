@@ -161,31 +161,32 @@
 		reg = <0x76>;
 	};
 
-	tc358743@f {
-		compatible = "toshiba,tc358743";
-		reg = <0x0f>;
-		clocks = <&hdmi_osc>;
-		clock-names = "refclk";
-		pinctrl-names = "rockchip,camera_default";
-		// reset-gpios = <&gpio6 9 GPIO_ACTIVE_LOW>;
-		reset-gpios = <&gpio3 RK_PA6 GPIO_ACTIVE_HIGH>;
-		interrupt-parent = <&gpio2>;
-		interrupts = <5 IRQ_TYPE_LEVEL_HIGH>;
-		rockchip,camera-module-index = <1>;
-		rockchip,camera-module-facing = "front";
-		rockchip,camera-module-name = "TRC-2232A6";
-		rockchip,camera-module-lens-name = "28IRC-4M-F22-v1.0x23";
+	// TODO: need to debug tc358743 chip
+	// tc358743@f {
+	// 	compatible = "toshiba,tc358743";
+	// 	reg = <0x0f>;
+	// 	clocks = <&hdmi_osc>;
+	// 	clock-names = "refclk";
+	// 	pinctrl-names = "rockchip,camera_default";
+	// 	// reset-gpios = <&gpio6 9 GPIO_ACTIVE_LOW>;
+	// 	//reset-gpios = <&gpio3 RK_PA6 GPIO_ACTIVE_HIGH>;
+	// 	// interrupt-parent = <&gpio2>;
+	// 	// interrupts = <5 IRQ_TYPE_LEVEL_HIGH>;
+	// 	rockchip,camera-module-index = <1>;
+	// 	rockchip,camera-module-facing = "front";
+	// 	rockchip,camera-module-name = "TRC-2232A6";
+	// 	rockchip,camera-module-lens-name = "28IRC-4M-F22-v1.0x23";
 
-		port {
-			tc358743_out: endpoint {
-				remote-endpoint = <&tc358743_out_in>;
-				data-lanes = <1 2>;
-				clock-lanes = <0>;
-				clock-noncontinuous;
-				link-frequencies = /bits/ 64 <297000000>;
-			};
-		};
-	};
+	// 	port {
+	// 		tc358743_out: endpoint {
+	// 			remote-endpoint = <&tc358743_out_in>;
+	// 			data-lanes = <1 2 3 4>;
+	// 			clock-lanes = <0>;
+	// 			clock-noncontinuous;
+	// 			link-frequencies = /bits/ 64 <297000000>;
+	// 		};
+	// 	};
+	// };
 
 };
 
@@ -323,7 +324,7 @@
 		port {
 			mipi_out_ucam1: endpoint {
 				remote-endpoint = <&mipi_in_ucam1>;
-				data-lanes = <1 2>;
+				data-lanes = <1 2>; // used 2 lanes
 			};
 		};
 	};
@@ -348,7 +349,7 @@
 		port {
 			mipi_out_imx307: endpoint {
 				remote-endpoint = <&mipi_in_imx307>;
-				data-lanes = <1 2>;
+				data-lanes = <1 2 3 4>; // 4 lanes
 			};
 		};
 	};
@@ -369,17 +370,17 @@
 				reg = <0>;
 				// The port name of the sensor
 				remote-endpoint = <&mipi_out_ucam0>;
-				// mipi lane number，1lane is <1>, 4lane is <1 2 3 4>
 				data-lanes = <1 2>;
 			};
 
-			tc358743_out_in: endpoint@1 {
-				reg = <1>;
-				// The port name of the sensor
-				remote-endpoint = <&tc358743_out>;
-				// mipi lane number，1lane is <1>, 4lane is <1 2 3 4>
-				data-lanes = <1 2>;
-			};
+			// TODO: need to debug tc358743 chip
+			// tc358743_out_in: endpoint@1 {
+			// 	reg = <1>;
+			// 	// The port name of the sensor
+			// 	remote-endpoint = <&tc358743_out>;
+			// 	// mipi lane number，1lane is <1>, 4lane is <1 2 3 4>
+			// 	data-lanes = <1 2 3 4>;
+			// };
 		};
 		port@1 {
 			reg = <1>;
@@ -407,16 +408,14 @@
 				reg = <0>;
 				// The port name of the sensor
 				remote-endpoint = <&mipi_out_ucam1>;
-				// mipi lane number，1lane is <1>, 4lane is <1 2 3 4>
-				data-lanes = <1 2>;
+				data-lanes = <1 2>; // used 2 lanes
 			};
 
 			mipi_in_imx307: endpoint@1 {
 				reg = <1>;
 				// The port name of the sensor
 				remote-endpoint = <&mipi_out_imx307>;
-				// mipi lane number，1lane is <1>, 4lane is <1 2 3 4>
-				data-lanes = <1 2>;
+				data-lanes = <1 2 3 4>; // used 4 lanes
 			};
 		};
 		port@1 {
@@ -446,7 +445,7 @@
 
 &rkisp_vir0 {
 	status = "okay";
-	wait-line = <720>;
+	//wait-line = <720>;
 	ports {
 		#address-cells = <1>;
 		#size-cells = <0>;
@@ -475,7 +474,7 @@
 
 &rkisp_vir1 {
 	status = "okay";
-	wait-line = <720>;
+	//wait-line = <720>;
 	ports {
 		#address-cells = <1>;
 		#size-cells = <0>;
@@ -516,7 +515,7 @@
 
 &rkispp_vir0 {
 	status = "okay";
-	wait-line = <1280>;
+	//wait-line = <1280>;
 	port {
 		#address-cells = <1>;
 		#size-cells = <0>;
@@ -530,7 +529,7 @@
 
 &rkispp_vir1 {
 	status = "okay";
-	wait-line = <1280>;
+	//wait-line = <1280>;
 	port {
 		#address-cells = <1>;
 		#size-cells = <0>;
