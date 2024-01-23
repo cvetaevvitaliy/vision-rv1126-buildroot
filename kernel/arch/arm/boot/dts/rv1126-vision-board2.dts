@@ -17,19 +17,19 @@
 	};
 
 	leds {
-        compatible = "gpio-leds";
-        led_stat {
-            gpios = <&gpio1 RK_PB2 GPIO_ACTIVE_LOW>;
+		compatible = "gpio-leds";
+		led_stat {
+			gpios = <&gpio1 RK_PB2 GPIO_ACTIVE_LOW>;
 			label = "heartbeat";
 			default-state = "off";
 			linux,default-trigger = "heartbeat";
-        };
+		};
 		led_act {
-            gpios = <&gpio1 RK_PB3 GPIO_ACTIVE_LOW>;
-            label = "green";
-            default-state = "off";
-        };
-    };
+			gpios = <&gpio1 RK_PB3 GPIO_ACTIVE_LOW>;
+			label = "green";
+			default-state = "off";
+		};
+	};
 
 	// OSD pads for connect joystick
 	adc_keys: adc-keys
@@ -70,7 +70,13 @@
 			press-threshold-microvolt = <1477000>;
 		};
 	};
-
+	
+	hdmi_osc: hdmi-osc {
+		compatible = "fixed-clock";
+		clock-output-names = "hdmi-osc";
+		clock-frequency = <27000000>;
+		#clock-cells = <0>;
+	};
 
 };
 
@@ -155,6 +161,34 @@
 		compatible = "bosch,bmp280";
 		reg = <0x76>;
 	};
+
+	// TODO: need to debug tc358743 chip
+	// tc358743@f {
+	// 	compatible = "toshiba,tc358743";
+	// 	reg = <0x0f>;
+	// 	clocks = <&hdmi_osc>;
+	// 	clock-names = "refclk";
+	// 	pinctrl-names = "rockchip,camera_default";
+	// 	// reset-gpios = <&gpio6 9 GPIO_ACTIVE_LOW>;
+	// 	//reset-gpios = <&gpio3 RK_PA6 GPIO_ACTIVE_HIGH>;
+	// 	// interrupt-parent = <&gpio2>;
+	// 	// interrupts = <5 IRQ_TYPE_LEVEL_HIGH>;
+	// 	rockchip,camera-module-index = <1>;
+	// 	rockchip,camera-module-facing = "front";
+	// 	rockchip,camera-module-name = "TRC-2232A6";
+	// 	rockchip,camera-module-lens-name = "28IRC-4M-F22-v1.0x23";
+
+	// 	port {
+	// 		tc358743_out: endpoint {
+	// 			remote-endpoint = <&tc358743_out_in>;
+	// 			data-lanes = <1 2 3 4>;
+	// 			clock-lanes = <0>;
+	// 			clock-noncontinuous;
+	// 			link-frequencies = /bits/ 64 <297000000>;
+	// 		};
+	// 	};
+	// };
+
 };
 
 
@@ -262,8 +296,8 @@
 	// 	rockchip,camera-module-lens-name = "IR0147-28IRC-8M-F20";
 
 	// 	port {
-	// 		mipi_out_ucam1: endpoint {
-	// 			remote-endpoint = <&mipi_in_ucam1>;
+	// 		mipi_out_imx219: endpoint {
+	// 			remote-endpoint = <&mipi_in_imx219>;
 	// 			data-lanes = <1 2>;
 	// 		};
 	// 	};
@@ -291,10 +325,36 @@
 		port {
 			mipi_out_ucam1: endpoint {
 				remote-endpoint = <&mipi_in_ucam1>;
-				data-lanes = <1 2>;
+				data-lanes = <1 2>; // used 2 lanes
 			};
 		};
 	};
+
+	imx307: imx307@1a {
+		compatible = "sony,imx307";
+		status = "okay";
+		rockchip,camera-module-index = <1>;
+		reg = <0x1a>;
+		clocks = <&cru CLK_MIPICSI_OUT>;
+		clock-names = "xvclk";
+		power-domains = <&power RV1126_PD_VI>;
+		pinctrl-names = "rockchip,camera_default";
+		pinctrl-0 = <&mipicsi_clk1>;
+		dvdd-supply = <&vcc3v3_sys>;
+		dovdd-supply = <&vcc3v3_sys>;
+		avdd-supply = <&vcc3v3_sys>;
+		reset-gpios = <&gpio1 RK_PD5 GPIO_ACTIVE_HIGH>;
+		rockchip,camera-module-facing = "front";
+		rockchip,camera-module-name = "MTV4-IR-E-P";
+		rockchip,camera-module-lens-name = "40IRC-4MP-F16";
+		port {
+			mipi_out_imx307: endpoint {
+				remote-endpoint = <&mipi_in_imx307>;
+				data-lanes = <1 2 3 4>; // 4 lanes
+			};
+		};
+	};
+
 };
 
 
@@ -307,13 +367,21 @@
 			reg = <0>;
 			#address-cells = <1>;
 			#size-cells = <0>;
-			mipi_in_ucam0: endpoint@1 {
-				reg = <1>;
+			mipi_in_ucam0: endpoint@0 {
+				reg = <0>;
 				// The port name of the sensor
 				remote-endpoint = <&mipi_out_ucam0>;
-				// mipi lane number，1lane is <1>, 4lane is <1 2 3 4>
 				data-lanes = <1 2>;
 			};
+
+			// TODO: need to debug tc358743 chip
+			// tc358743_out_in: endpoint@1 {
+			// 	reg = <1>;
+			// 	// The port name of the sensor
+			// 	remote-endpoint = <&tc358743_out>;
+			// 	// mipi lane number，1lane is <1>, 4lane is <1 2 3 4>
+			// 	data-lanes = <1 2 3 4>;
+			// };
 		};
 		port@1 {
 			reg = <1>;
@@ -337,12 +405,18 @@
 			reg = <0>;
 			#address-cells = <1>;
 			#size-cells = <0>;
-			mipi_in_ucam1: endpoint@1 {
-				reg = <1>;
+			mipi_in_ucam1: endpoint@0 {
+				reg = <0>;
 				// The port name of the sensor
 				remote-endpoint = <&mipi_out_ucam1>;
-				// mipi lane number，1lane is <1>, 4lane is <1 2 3 4>
-				data-lanes = <1 2>;
+				data-lanes = <1 2>; // used 2 lanes
+			};
+
+			mipi_in_imx307: endpoint@1 {
+				reg = <1>;
+				// The port name of the sensor
+				remote-endpoint = <&mipi_out_imx307>;
+				data-lanes = <1 2 3 4>; // used 4 lanes
 			};
 		};
 		port@1 {
