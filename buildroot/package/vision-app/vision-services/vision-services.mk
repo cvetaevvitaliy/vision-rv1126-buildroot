@@ -92,6 +92,7 @@ endef
 define VISION_SERVICES_INSTALL_ASSETS
 	$(INSTALL) -D -m  644 $(@D)/assets/screensaver.png ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/assets/screensaver.png
 	$(INSTALL) -D -m  755 $(@D)/assets/vision ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/usr/bin/vision
+	$(INSTALL) -D -m  755 $(@D)/assets/mount.sdcard.sh ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/usr/bin/mount.sdcard.sh
 endef
 
 define VISION_SERVICES_INSTALL_SCRIPTS
