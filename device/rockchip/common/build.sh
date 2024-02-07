@@ -277,6 +277,7 @@ function usage()
 	echo "info               -see the current board building information"
 	echo "app/<pkg>          -build packages in the dir of app/*"
 	echo "external/<pkg>     -build packages in the dir of external/*"
+	echo "-sdk               -prepare SDK during rootfs build (an additional option)"
 	echo ""
 	echo "Default option is 'allff'."
 }
@@ -740,7 +741,7 @@ function build_buildroot(){
 		echo "====No Found config on `realpath $BOARD_CONFIG`. Just exit ..."
 		return
 	fi
-	/usr/bin/time -f "you take %E to build builroot" $COMMON_DIR/mk-buildroot.sh $BOARD_CONFIG
+	/usr/bin/time -f "you take %E to build builroot" $COMMON_DIR/mk-buildroot.sh $BOARD_CONFIG $SDK_OPTION
 	if [ $? -eq 0 ]; then
 		echo "====Build buildroot ok!===="
 	else
@@ -1436,6 +1437,9 @@ if echo $@|grep -wqE "help|-h"; then
 fi
 
 OPTIONS="${@:-allff}"
+[ "$(echo -n $@)" == "-sdk" ] && OPTIONS="-sdk allff"
+
+SDK_OPTION=
 
 [ -f "$TOP_DIR/device/rockchip/$RK_TARGET_PRODUCT/$RK_BOARD_PRE_BUILD_SCRIPT" ] \
 	&& source "$TOP_DIR/device/rockchip/$RK_TARGET_PRODUCT/$RK_BOARD_PRE_BUILD_SCRIPT"  # board hooks
@@ -1509,6 +1513,7 @@ for option in ${OPTIONS}; do
 		multi-npu_boot) build_multi-npu_boot ;;
 		info) build_info ;;
 		app/*|external/*) build_pkg $option ;;
+		-sdk) SDK_OPTION=sdk ;;
 		*) usage ;;
 	esac
 done

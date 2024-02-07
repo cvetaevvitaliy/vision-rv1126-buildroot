@@ -34,7 +34,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - bash build.sh kernel
 
     - echo "Start Build buildroot... "
-    - bash build.sh rootfs
+    - bash build.sh -sdk rootfs
 
     - echo "Start Build recovery... "
     - bash build.sh recovery

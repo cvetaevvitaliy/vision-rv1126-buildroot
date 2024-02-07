@@ -132,6 +132,8 @@ define VISION_SERVICES_ENCRYPT_SERVICES
 	@echo "> Vision_security"
 	rm -rf /tmp/vision_security
 
+	cp -r $(@D)/assets/security/* "${TARGET_DIR}/"
+
 	$(foreach svc,$(VISION_SERVICES_ENCRYPT_LIST),$(call VIS_SEC_PREPARE,$(svc)))
 
 	$(call VIS_SEC_PREPARE,oem/ai_model/default_model.rknn)
