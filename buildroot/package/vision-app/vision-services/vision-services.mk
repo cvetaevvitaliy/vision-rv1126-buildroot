@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-VISION_SERVICES_VERSION = origin/update-from-sdcard
+VISION_SERVICES_VERSION = 0.0.23
 VISION_SERVICES_SITE = ssh://git@gitlab.hard-tech.org.ua/vision/vision-services.git
 VISION_SERVICES_SITE_METHOD = git
 VISION_SERVICES_INSTALL_STAGING = NO
@@ -92,9 +92,8 @@ endef
 define VISION_SERVICES_INSTALL_ASSETS
 	$(INSTALL) -D -m  644 $(@D)/assets/screensaver.png ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/assets/screensaver.png
 	$(INSTALL) -D -m  755 $(@D)/assets/vision ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/usr/bin/vision
-	$(INSTALL) -D -m  755 $(@D)/assets/sanity_check.sh ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/usr/bin/sanity_check.sh
-	$(INSTALL) -D -m  755 $(@D)/assets/mount.sdcard.sh ${BASE_DIR}/target/usr/bin/mount.sdcard.sh
-	echo "0.0.21" > ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/etc/vision/version # should be content of VISION_SERVICES_VERSION
+	$(INSTALL) -D -m  755 ${TOPDIR}/../tools/mount.sdcard.sh ${BASE_DIR}/target/usr/bin/mount.sdcard.sh
+	echo "${VISION_SERVICES_VERSION}" > ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/etc/vision/version # should be content of VISION_SERVICES_VERSION
 endef
 
 define VISION_SERVICES_INSTALL_SCRIPTS

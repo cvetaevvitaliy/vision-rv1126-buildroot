@@ -5,13 +5,13 @@ ATTRS{type}!="SD", GOTO="sd_cards_auto_mount_end"
 
 IMPORT{program}="/sbin/blkid -o udev -p %N"
 
-ACTION=="add", ENV{ID_FS_TYPE}=="vfat",  RUN+="/usr/bin/mount.sdcard.sh vfat /dev/%k"
-ACTION=="add", ENV{ID_FS_TYPE}=="ntfs",  RUN+="/usr/bin/mount.sdcard.sh ntfs /dev/%k"
-ACTION=="add", ENV{ID_FS_TYPE}=="exfat", RUN+="/usr/bin/mount.sdcard.sh exfat /dev/%k"
-ACTION=="add", ENV{ID_FS_TYPE}=="ext2",  RUN+="/usr/bin/mount.sdcard.sh ext2  /dev/%k"
-ACTION=="add", ENV{ID_FS_TYPE}=="ext3",  RUN+="/usr/bin/mount.sdcard.sh ext3  /dev/%k"
-ACTION=="add", ENV{ID_FS_TYPE}=="ext4",  RUN+="/usr/bin/mount.sdcard.sh ext4  /dev/%k"
+ACTION=="add", ENV{ID_FS_TYPE}=="vfat",  RUN+="/usr/bin/mount.sdcard.sh mount vfat /dev/%k"
+ACTION=="add", ENV{ID_FS_TYPE}=="ntfs",  RUN+="/usr/bin/mount.sdcard.sh mount ntfs /dev/%k"
+ACTION=="add", ENV{ID_FS_TYPE}=="exfat", RUN+="/usr/bin/mount.sdcard.sh mount exfat /dev/%k"
+ACTION=="add", ENV{ID_FS_TYPE}=="ext2",  RUN+="/usr/bin/mount.sdcard.sh mount ext2  /dev/%k"
+ACTION=="add", ENV{ID_FS_TYPE}=="ext3",  RUN+="/usr/bin/mount.sdcard.sh mount ext3  /dev/%k"
+ACTION=="add", ENV{ID_FS_TYPE}=="ext4",  RUN+="/usr/bin/mount.sdcard.sh mount ext4  /dev/%k"
 
-ACTION=="remove", RUN+="/bin/umount '/mnt/sdcard'"
+ACTION=="remove", RUN+="/usr/bin/mount.sdcard.sh umount"
 
 LABEL="sd_cards_auto_mount_end"
