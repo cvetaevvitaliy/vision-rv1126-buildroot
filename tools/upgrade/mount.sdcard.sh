@@ -6,7 +6,7 @@ message() {
 }
 
 find_update_image() {
-        TEMPLATE=".*VISION_OEM_([[:digit:]]{1,3}\.){3}img$"
+        TEMPLATE="^VISION_OEM_([[:digit:]]{1,3}\.){3}img$"
 
         IMAGE_FILE=$(ls /mnt/sdcard |egrep ${TEMPLATE})
         MATCHING_FILES_N=$(echo ${IMAGE_FILE} | wc -w)
@@ -37,7 +37,6 @@ do_upgrade() {
 
         touch /tmp/oem.upgraded
 
-        # switch on green led
 	start-stop-daemon -S -q -b -x /usr/bin/blink.sh green
 
         message "updated services, exiting normally"
@@ -82,6 +81,7 @@ if [ $1 = "mount" ]; then
         IMG_FILE=$(find_update_image)
         if [[ -z ${IMG_FILE} ]]; then
                 message "update is impossible"
+                start-stop-daemon -S -q -b -x /usr/bin/blink.sh green 0
                 exit 1
         fi
 
