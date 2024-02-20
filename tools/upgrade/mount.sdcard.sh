@@ -6,9 +6,7 @@ message() {
 }
 
 find_update_image() {
-        TEMPLATE="^VISION_OEM_([[:digit:]]{1,3}\.){3}img$"
-
-        IMAGE_FILE=$(ls /mnt/sdcard |egrep ${TEMPLATE})
+        IMAGE_FILE=$(ls /mnt/sdcard/VISION_OEM_*.img)
         MATCHING_FILES_N=$(echo ${IMAGE_FILE} | wc -w)
         if [ ${MATCHING_FILES_N} -eq 0 ]; then
                 message "no update images found"
@@ -25,9 +23,9 @@ find_update_image() {
 do_upgrade() {
         UPDATE_IMG_FILE=$1
         # stop all vision processes
-        for PID in `ps ax | awk '{ if ($5 ~ /vision/) print $1}'`;
+        for SVC in $(grep -l /oem/usr/bin/ /etc/init.d/* | sort -r);
         do
-                kill -9 $PID
+                $SVC stop
         done
         sleep 5 # allow sometime to finish processes
         umount /oem
@@ -85,7 +83,7 @@ if [ $1 = "mount" ]; then
                 exit 1
         fi
 
-        IMG_VERSION=$(echo $IMG_FILE | sed -n -E 's/VISION_OEM_//p' | sed -n -E 's/\.img//p')
+        IMG_VERSION=${IMG_FILE:11:-4}
         CUR_VERSION=$(cat /oem/etc/vision/version)
 
         message "doing update: ${CUR_VERSION} -> ${IMG_VERSION}"
