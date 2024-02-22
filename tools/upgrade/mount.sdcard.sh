@@ -69,12 +69,11 @@ else
 fi
 
 if [ $1 = "mount" ]; then 
-        if df | awk '{ if ($6 == "/mnt/sdcard") { exit 1; } }'; then
-                do_mount $2 $3
-        else
+        if mountpoint -q -- /mnt/sdcard; then
                 message "/mnt/sdcard is already mounted. no update will be made"
                 exit 1
         fi
+        do_mount $2 $3
 
         IMG_FILE=$(find_update_image)
         if [[ -z ${IMG_FILE} ]]; then
