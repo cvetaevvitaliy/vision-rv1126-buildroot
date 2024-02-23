@@ -260,7 +260,7 @@ else
 	fi
 fi
 
-OEM_VERSION=$(ls $TOP_DIR/buildroot/output/rockchip_rv1126_vision/build | grep vision-services | awk -F \- '{ print $3 }')
+OEM_VERSION=$(cat "$TARGET_OUTPUT_DIR/oem/etc/vision/version")
 if [ -d $ROCKDEV ] && [ -f $ROCKDEV/oem.img ]; then
 	cp $ROCKDEV/oem.img $ROCKDEV/VISION_OEM_${OEM_VERSION}.img
 fi
