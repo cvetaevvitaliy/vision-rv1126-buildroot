@@ -87,7 +87,7 @@ if [ $1 = "mount" ]; then
 
         message "doing update: ${CUR_VERSION} -> ${IMG_VERSION}"
 
-        if ! do_upgrade /mnt/sdcard/${IMG_FILE}; then
+        if ! do_upgrade ${IMG_FILE}; then
                 message "update failed"
                 exit 1
         fi
