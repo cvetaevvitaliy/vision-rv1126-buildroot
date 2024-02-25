@@ -67,7 +67,7 @@ else
         message already running
         exit 0
 fi
-
+set +C
 if [ $1 = "mount" ]; then 
         if mountpoint -q -- /mnt/sdcard; then
                 message "/mnt/sdcard is already mounted. no update will be made"
