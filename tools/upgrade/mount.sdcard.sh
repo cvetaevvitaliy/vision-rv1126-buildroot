@@ -35,7 +35,9 @@ do_upgrade() {
 
         touch /tmp/oem.upgraded
 
-	start-stop-daemon -S -q -b -x /usr/bin/blink.sh green
+	echo timer > /sys/devices/platform/leds/leds/green/trigger
+	echo 500 > /sys/devices/platform/leds/leds/green/delay_on
+	echo 500 > /sys/devices/platform/leds/leds/green/delay_off
 
         message "updated services, exiting normally"
         return 0
@@ -78,7 +80,7 @@ if [ $1 = "mount" ]; then
         IMG_FILE=$(find_update_image)
         if [[ -z ${IMG_FILE} ]]; then
                 message "update is impossible"
-                start-stop-daemon -S -q -b -x /usr/bin/blink.sh green 0
+                echo default-on > /sys/devices/platform/leds/leds/green/trigger
                 exit 1
         fi
 
@@ -96,6 +98,7 @@ elif [ $1 = "umount" ]; then
 	message "umount"
         /bin/umount /mnt/sdcard
         [[ -e /tmp/oem.upgraded ]] && rm /tmp/oem.upgraded && reboot
+        echo none > /sys/devices/platform/leds/leds/green/trigger
 else
         message "called with wrong parameter $1"
 fi

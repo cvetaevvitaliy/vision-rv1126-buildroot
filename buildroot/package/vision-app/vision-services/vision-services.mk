@@ -93,7 +93,6 @@ define VISION_SERVICES_INSTALL_ASSETS
 	$(INSTALL) -D -m  644 $(@D)/assets/screensaver.png ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/assets/screensaver.png
 	$(INSTALL) -D -m  755 $(@D)/assets/vision ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/usr/bin/vision
 	$(INSTALL) -D -m  755 ${TOPDIR}/../tools/upgrade/mount.sdcard.sh ${BASE_DIR}/target/usr/bin/mount.sdcard.sh
-	$(INSTALL) -D -m  755 ${TOPDIR}/../tools/upgrade/blink.sh ${BASE_DIR}/target/usr/bin/blink.sh
 	echo "${VISION_SERVICES_VERSION}" > ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/etc/vision/version # should be content of VISION_SERVICES_VERSION
 endef
 
