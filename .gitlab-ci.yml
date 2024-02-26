@@ -33,6 +33,9 @@ build-job:       # This job runs in the build stage, which runs first.
     - echo "Start Build kernel... "
     - bash build.sh kernel
 
+    - echo "Sourcing env setup"
+    - source envsetup.sh rockchip_rv1126_vision
+
     - echo "Start Build buildroot... "
     - bash build.sh -sdk rootfs
 
