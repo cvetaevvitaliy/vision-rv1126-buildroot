@@ -3,6 +3,9 @@
 
 message() {
         logger -s "mount.sdcard.sh: $1"
+        if [ -x "$(command -v /oem/usr/bin/psplash-write)" ]; then
+                /oem/usr/bin/psplash-write "MSG $1"
+        fi
 }
 
 find_update_image() {
@@ -20,6 +23,13 @@ find_update_image() {
         fi
 }
 
+init_splash_screen() {
+        /oem/usr/bin/psplash > /dev/null 2>&1 &
+        sleep .2
+        /oem/usr/bin/psplash-write "MSG START UPDATING..."
+        /oem/usr/bin/psplash-write "PROGRESS 0"
+}
+
 do_upgrade() {
         UPDATE_IMG_FILE=$1
         # stop all vision processes
@@ -27,7 +37,12 @@ do_upgrade() {
         do
                 $SVC stop
         done
+        
         sleep 5 # allow sometime to finish processes
+
+        if [ -x "$(command -v /oem/usr/bin/psplash-write)" ]; then
+                init_splash_screen
+        fi
         umount /oem
 
         message "updating /oem"
