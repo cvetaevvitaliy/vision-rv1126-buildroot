@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REPO_URL="https://gitlab.hard-tech.org.ua/vision/vision-taf.git"
+REPO_URL="git@gitlab.hard-tech.org.ua:vision/vision-taf.git"
 PROJECT_DIR="vision-taf"
 
 if [ -d "$PROJECT_DIR" ]; then
