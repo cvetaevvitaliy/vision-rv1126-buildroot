@@ -64,12 +64,12 @@ build-job:       # This job runs in the build stage, which runs first.
       expire_in: 2 week    
       
       
- test-job:       # This job runs in the test stage, which runs second.
-  stage: test
-  script:
-      - echo "Run tests ..."
-  rule:
-      if: $CI_COMMIT_BRANCH == "master"
-  needs:
-      - bash test_script.sh     
+  test-job:       # This job runs in the test stage, which runs second.
+    stage: test
+    script:
+        - echo "Run tests ..."
+    rule:
+        if: $CI_COMMIT_BRANCH == "master"
+    needs:
+        - bash test_script.sh     
 
