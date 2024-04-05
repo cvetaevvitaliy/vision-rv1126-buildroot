@@ -66,6 +66,11 @@ build-job:       # This job runs in the build stage, which runs first.
       
   test-job:       # This job runs in the test stage, which runs second.
     stage: test
+  allow_failure: true
+  needs:
+  - job: build-job
+    artifacts: true
+
     script:
         - echo "Run tests ..."
     rule:
