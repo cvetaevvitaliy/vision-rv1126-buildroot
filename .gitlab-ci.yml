@@ -22,6 +22,9 @@ stages:          # List of stages for jobs, and their order of execution
 
 build-job:       # This job runs in the build stage, which runs first.
   stage: build
+  before_script:
+    - echo "Enabling the encrypted vision services..."
+    - echo "BR2_PACKAGE_VISION_ENCRYPTED=y" >> buildroot/configs/rockchip_rv1126_vision_defconfig
   script:
     - echo "Prepare environment for build ..."
     - bash build.sh device/rockchip/rv1126_rv1109/vision-rv1126.mk
@@ -75,3 +78,49 @@ test-job: # This job runs in the test stage, which runs second.
     - echo "Run tests ..."
     - bash test_script.sh
 
+# manual-build-job-with-encrypted-vision-services:
+#   when: manual
+#   allow_failure: false
+#   before_script:
+#     - echo "Enabling the encrypted vision services..."
+#     - echo "BR2_PACKAGE_VISION_ENCRYPTED=y" >> buildroot/configs/rockchip_rv1126_vision_defconfig
+#   script:
+#     - echo "Prepare environment for build ..."
+#     - bash build.sh device/rockchip/rv1126_rv1109/vision-rv1126.mk
+#     - bash build.sh cleanall
+#     - bash build.sh device/rockchip/rv1126_rv1109/vision-rv1126.mk
+
+#     - echo "Start Build u-boot... "
+#     - bash build.sh uboot
+
+#     - echo "Start Build kernel... "
+#     - bash build.sh kernel
+
+#     - echo "Sourcing env setup"
+#     - source envsetup.sh rockchip_rv1126_vision
+
+#     - echo "Start Build buildroot... "
+#     - bash build.sh -sdk rootfs
+
+#     - echo "Start Build recovery... "
+#     - bash build.sh recovery
+
+#     - echo "Prepare images... "
+#     - bash mkfirmware.sh
+
+#     - echo "Prepare update image... "
+#     - bash build.sh updateimg
+
+#     - mkdir -p artifacts
+#     - cp -L -r rockdev/* artifacts/
+
+#     - mkdir -p artifacts_sdk/
+#     - cp -L rockdev_sdk/vision-sdk.tar.gz artifacts_sdk/
+
+#     - echo "Compile complete. All jobs done"
+
+#   artifacts:
+#     paths:
+#       - artifacts/*
+#       - artifacts_sdk/*
+#     expire_in: 2 week
