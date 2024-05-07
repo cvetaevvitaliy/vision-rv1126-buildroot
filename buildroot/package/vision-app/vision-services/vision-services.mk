@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-VISION_SERVICES_VERSION = 0.2.0
+VISION_SERVICES_VERSION = 7d7bd136abc43ebf361c84baf2173475db4a279c
 VISION_SERVICES_SITE = ssh://git@gitlab.hard-tech.org.ua/vision/vision-services.git
 VISION_SERVICES_SITE_METHOD = git
 VISION_SERVICES_INSTALL_STAGING = NO
@@ -49,6 +49,7 @@ endif
 ifeq ($(BR2_PACKAGE_VISION_TRACKER_SERVICE),y)
 	VISION_SERVICES_CONF_OPTS += "-DBUILD_TRACKER_SERVICE=ON"
 	VISION_SERVICES_ENCRYPT_LIST += oem/usr/bin/vision-tracker-service
+	VISION_SERVICES_ENCRYPT_LIST += etc/init.d/S54vision-tracker-service
 else
 	VISION_SERVICES_CONF_OPTS += "-DBUILD_TRACKER_SERVICE=OFF"
 endif
