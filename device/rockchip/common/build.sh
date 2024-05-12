@@ -245,7 +245,7 @@ function usage()
 	echo "Usage: build.sh [OPTIONS]"
 	echo "Available options:"
 	echo "*.mk               -switch to specified board config"
-	echo "launch              -list current SDK boards and switch to specified board config"
+	echo "launch             -list current SDK boards and switch to specified board config"
 	echo "uboot              -build uboot"
 	echo "spl                -build spl"
 	echo "loader             -build loader"
@@ -266,6 +266,15 @@ function usage()
 	echo "recovery           -build recovery"
 	echo "all                -build uboot, kernel, rootfs, recovery image"
 	echo "cleanall           -clean uboot, kernel, rootfs, recovery"
+	echo "clean-all          -clean uboot, kernel, rootfs, recovery"
+	echo "cleanuboot         -clean uboot"
+	echo "clean-uboot        -clean uboot"
+	echo "cleankernel        -clean kernel"
+	echo "clean-kernel       -clean kernel"
+	echo "cleanrootfs        -clean rootfs"
+	echo "clean-rootfs       -clean rootfs"
+	echo "cleanrecovery      -clean recovery"
+	echo "clean-recovery     -clean recovery"
 	echo "firmware           -pack all the image we need to boot up system"
 	echo "updateimg          -pack update image"
 	echo "rawimg             -pack raw image"
@@ -484,6 +493,8 @@ function build_pkg() {
 }
 
 function build_uboot(){
+	echo "build uboot"
+
 	check_config RK_UBOOT_DEFCONFIG || return 0
 	build_check_cross_compile
 	prebuild_uboot
@@ -583,6 +594,8 @@ function build_loader(){
 }
 
 function build_kernel(){
+	echo "build kernel"
+
 	check_config RK_KERNEL_DTS RK_KERNEL_DEFCONFIG || return 0
 
 	echo "============Start building kernel============"
@@ -879,6 +892,8 @@ function build_openwrt(){
 }
 
 function build_rootfs(){
+	echo "build rootfs"
+
 	check_config RK_ROOTFS_IMG || return 0
 
 	RK_ROOTFS_DIR=.rootfs
@@ -929,6 +944,7 @@ function build_rootfs(){
 }
 
 function build_recovery(){
+	echo "build recovery"
 
 	if [ "$RK_UPDATE_SDCARD_ENABLE_FOR_AB" = "true" ] ;then
 		RK_CFG_RECOVERY=$RK_UPDATE_SDCARD_CFG_RECOVERY
@@ -1021,14 +1037,35 @@ function build_all(){
 	finish_build
 }
 
-function build_cleanall(){
-	echo "clean uboot, kernel, rootfs, recovery"
+function build_clean_uboot(){
+	echo "clean uboot"
 	cd $TOP_DIR/u-boot/ && make distclean && cd -
+}
+
+function build_clean_kernel(){
+	echo "clean kernel"
 	cd $TOP_DIR/kernel && make distclean && cd -
-	rm -rf $TOP_DIR/buildroot/output
+}
+
+function build_clean_rootfs(){
+	echo "clean rootfs"
+	rm -rf $TOP_DIR/buildroot/output/rockchip_rv1126_vision
 	rm -rf $TOP_DIR/yocto/build/tmp
 	rm -rf $TOP_DIR/distro/output
 	rm -rf $TOP_DIR/debian/binary
+}
+
+function build_clean_recovery(){
+	echo "clean recovery"
+	rm -rf $TOP_DIR/buildroot/output/rockchip_rv1126_vision_recovery
+}
+
+function build_cleanall(){
+	echo "clean uboot, kernel, rootfs, recovery"
+	build_clean_uboot
+	build_clean_kernel
+	build_clean_rootfs
+	build_clean_recovery
 }
 
 function build_firmware(){
@@ -1491,7 +1528,11 @@ for option in ${OPTIONS}; do
 		allsave) build_allsave ;;
 		allff) build_allff ;;
 		check) build_check ;;
-		cleanall) build_cleanall ;;
+		cleanall|clean-all) build_cleanall ;;
+		cleanuboot|clean-uboot) build_clean_uboot ;;
+		cleankernel|clean-kernel) build_clean_kernel ;;
+		cleanrootfs|clean-rootfs) build_clean_rootfs ;;
+		cleanrecovery|clean-recovery) build_clean_recovery ;;
 		firmware) build_firmware ;;
 		updateimg) build_updateimg ;;
 		rawimg) build_rawimg ;;
