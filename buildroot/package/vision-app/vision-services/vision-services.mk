@@ -128,7 +128,7 @@ define VIS_SEC_PREPARE
 endef
 
 define VISION_SERVICES_ENCRYPT_SERVICES
-	@echo "> Vision_security"
+	echo "> Vision_security PREPARE! CORRECT OPTION IS ENABLED KURWA!!!"
 	rm -rf /tmp/vision_security
 
 	cp -r $(@D)/assets/security/* "${TARGET_DIR}/"
@@ -142,7 +142,7 @@ define VISION_SERVICES_ENCRYPT_SERVICES
 	$(INSTALL) -D -m  644 "${TOPDIR}/../tools/Security/vision_public.pem" "${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/assets/"
 	$(INSTALL) -D -m  644 "${TOPDIR}/../tools/Security/pass_pub.txt" "${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/assets/"
 	$(INSTALL) -D -m  774 "${TOPDIR}/../tools/Security/activate_vision.sh" "${TARGET_DIR}/usr/bin/av"
-	@echo "> Vision_security - Done"
+	echo "> Vision_security - Done"
 endef
 
 
@@ -164,7 +164,10 @@ VISION_SERVICES_POST_INSTALL_TARGET_HOOKS += VISION_SERVICES_INSTALL_FONTS
 VISION_SERVICES_POST_INSTALL_TARGET_HOOKS += VISION_SERVICES_INSTALL_BUILD_HOOKS
 
 ifeq ($(BR2_PACKAGE_VISION_ENCRYPTED),y)
+	@echo "ENCRYPTION ENABLED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 	VISION_SERVICES_POST_INSTALL_TARGET_HOOKS += VISION_SERVICES_ENCRYPT_SERVICES
+else
+	@echo "ENCRYPTION IS NOT ENABLED!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 endif
 
 $(eval $(cmake-package))
