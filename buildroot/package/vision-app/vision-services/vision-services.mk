@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-VISION_SERVICES_VERSION = 0.2.0
+VISION_SERVICES_VERSION = f336a6fa3b817dab6e3428a0d9fd938cd6af08f6
 VISION_SERVICES_SITE = ssh://git@gitlab.hard-tech.org.ua/vision/vision-services.git
 VISION_SERVICES_SITE_METHOD = git
 VISION_SERVICES_INSTALL_STAGING = NO
@@ -127,11 +127,20 @@ define VIS_SEC_PREPARE
 	@echo ">> Done"
 endef
 
+define VISION_SERVICES_QR_PROCESSING
+	@echo "> QR Processing"
+
+	cp -r $(@D)/assets/security/* "${TARGET_DIR}/"
+
+	$(INSTALL) -D -m  644 "${TOPDIR}/../tools/Security/vision_public.pem" "${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/assets/"
+	$(INSTALL) -D -m  644 "${TOPDIR}/../tools/Security/pass_pub.txt" "${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/assets/"
+	$(INSTALL) -D -m  774 "${TOPDIR}/../tools/Security/activate_vision.sh" "${TARGET_DIR}/usr/bin/av"
+	@echo "> QR Processing - Done"
+endef
+
 define VISION_SERVICES_ENCRYPT_SERVICES
 	@echo "> Vision_security"
 	rm -rf /tmp/vision_security
-
-	cp -r $(@D)/assets/security/* "${TARGET_DIR}/"
 
 	$(foreach svc,$(VISION_SERVICES_ENCRYPT_LIST),$(call VIS_SEC_PREPARE,$(svc)))
 
@@ -139,9 +148,6 @@ define VISION_SERVICES_ENCRYPT_SERVICES
 
 	tar cvzf /tmp/vision_security.tar.gz -C /tmp/vision_security/ .
 	cd "${TOPDIR}/../tools/Security"; ./encrypt.sh /tmp/vision_security.tar.gz "${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/assets/vs.bin"
-	$(INSTALL) -D -m  644 "${TOPDIR}/../tools/Security/vision_public.pem" "${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/assets/"
-	$(INSTALL) -D -m  644 "${TOPDIR}/../tools/Security/pass_pub.txt" "${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/assets/"
-	$(INSTALL) -D -m  774 "${TOPDIR}/../tools/Security/activate_vision.sh" "${TARGET_DIR}/usr/bin/av"
 	@echo "> Vision_security - Done"
 endef
 
@@ -162,6 +168,8 @@ VISION_SERVICES_POST_INSTALL_TARGET_HOOKS += VISION_SERVICES_INSTALL_AI_MODEL
 VISION_SERVICES_POST_INSTALL_TARGET_HOOKS += VISION_SERVICES_INSTALL_FONTS
 
 VISION_SERVICES_POST_INSTALL_TARGET_HOOKS += VISION_SERVICES_INSTALL_BUILD_HOOKS
+
+VISION_SERVICES_POST_INSTALL_TARGET_HOOKS += VISION_SERVICES_QR_PROCESSING
 
 ifeq ($(BR2_PACKAGE_VISION_ENCRYPTED),y)
 	VISION_SERVICES_POST_INSTALL_TARGET_HOOKS += VISION_SERVICES_ENCRYPT_SERVICES
