@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-VISION_SERVICES_VERSION = f336a6fa3b817dab6e3428a0d9fd938cd6af08f6
+VISION_SERVICES_VERSION = 0.3.0
 VISION_SERVICES_SITE = ssh://git@gitlab.hard-tech.org.ua/vision/vision-services.git
 VISION_SERVICES_SITE_METHOD = git
 VISION_SERVICES_INSTALL_STAGING = NO
