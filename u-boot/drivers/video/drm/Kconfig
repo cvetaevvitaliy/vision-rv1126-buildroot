@@ -131,6 +131,13 @@ config DRM_ROCKCHIP_RK1000
 	  Choose this option to enable support for Rockchip RK1000 display
 	  bridge chips driver. say Y to enable its driver.
 
+config DRM_ROCKCHIP_ADV7391
+	bool "Rockchip ADV7391 display driver"
+	depends on DRM_ROCKCHIP
+	help
+	  Choose this option to enable support for Rockchip ADV7391 display
+	  chips driver. say Y to enable its driver.
+
 config ROCKCHIP_DRM_TVE
 	bool "Rockchip TVE Support"
 	depends on DRM_ROCKCHIP
