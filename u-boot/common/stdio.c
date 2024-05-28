@@ -372,7 +372,7 @@ int stdio_add_devices(void)
 	int ret;
 # endif
 
-	for (ret = uclass_first_device(UCLASS_VIDEO, &vdev);
+	for (ret = uclass_first_device(UCLASS_VIDEO | UCLASS_VIDEO_BRIDGE, &vdev);
 	     vdev;
 	     ret = uclass_next_device(&vdev))
 		;
