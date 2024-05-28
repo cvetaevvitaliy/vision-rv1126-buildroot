@@ -45,3 +45,47 @@
 	mmc-hs200-1_8v;
 	status = "okay";
 };
+
+&i2c5 {
+	/delete-property/ pinctrl-0;
+	status = "okay";
+	pinctrl-0 = <&i2c5m2_xfer>;
+	clock-frequency = <400000>;
+
+	adv7391: adv7391@2a {
+		compatible = "adi,adv7391";
+		reset-gpios = <&gpio1 RK_PC1 GPIO_ACTIVE_HIGH>;
+		reg = <0x2a>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			tve_in: port@0 {
+				reg = <0>;
+				panel_in_rgb: endpoint {
+					remote-endpoint = <&rgb_out_panel>;
+				};
+			};
+		};
+	};
+};
+
+&rgb {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&lcdc_ctl>;
+
+	ports {
+		port@1 {
+			reg = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			rgb_out_panel: endpoint@1 {
+				reg = <1>;
+				remote-endpoint = <&panel_in_rgb>;
+			};
+		};
+	};
+};
