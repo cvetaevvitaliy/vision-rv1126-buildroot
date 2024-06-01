@@ -308,6 +308,12 @@ else
 fi
 fi
 
+OEM_VERSION=$(cat "$TARGET_OUTPUT_DIR/oem/etc/vision/version")
+if [ -d $ROCKDEV ] && [ -f $ROCKDEV/oem.img ]; then
+	cp $ROCKDEV/oem.img $ROCKDEV/VISION_OEM_${OEM_VERSION}.img
+fi
+
+
 if [ $RK_USERDATA_DIR ]
 then
 	if [ -d "$USER_DATA_DIR" ]

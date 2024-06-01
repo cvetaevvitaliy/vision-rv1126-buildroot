@@ -7,7 +7,7 @@
 Install dependencies<br>
 **for ubuntu Ubuntu 20.04*
 ```shell
-sudo apt-get install -y bison texinfo flex cmake libssl-dev liblz4-tool patchelf chrpath gawk expect-dev python2 git git-lfs expect-dev debianutils sed make binutils build-essential gcc g++ bash patch gzip bzip2 perl tar cpio unzip rsync file bc git device-tree-compiler
+sudo apt-get install -y bison texinfo flex cmake libssl-dev liblz4-tool patchelf chrpath gawk expect-dev python2 python git git-lfs expect-dev debianutils sed make binutils build-essential gcc g++ bash patch gzip bzip2 perl tar cpio unzip rsync file bc git device-tree-compiler
 ```
 
 Clone project  

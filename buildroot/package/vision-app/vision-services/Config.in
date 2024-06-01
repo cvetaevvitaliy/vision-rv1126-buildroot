@@ -61,5 +61,10 @@ config BR2_PACKAGE_VISION_OSD_SERVICE
 	depends on BR2_PACKAGE_VISION_SERVICES
 	default y
 
+config BR2_PACKAGE_VISION_ENCRYPTED
+	bool "Encrypt critical services"
+	depends on BR2_PACKAGE_VISION_SERVICES
+	default n
+
 endmenu
 
