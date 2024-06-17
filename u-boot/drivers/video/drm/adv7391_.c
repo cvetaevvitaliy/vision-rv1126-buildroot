@@ -11,140 +11,37 @@
 
 #include <common.h>
 #include <i2c.h>
+#include <common.h>
 #include <dm.h>
 #include "adv739x_regs.h"
 #include "adv7391.h"
+
+#include <common.h>
 #include <boot_rkimg.h>
+#include <dm.h>
 #include <errno.h>
+#include <i2c.h>
 #include <video_bridge.h>
 #include <asm/io.h>
 #include <dm/device.h>
 #include <dm/device-internal.h>
 #include <linux/media-bus-format.h>
-#include <command.h>
 
-#include "rockchip_display.h"
-#include "rockchip_crtc.h"
-#include "rockchip_connector.h"
-#include "rockchip_phy.h"
 #include "rockchip_bridge.h"
+#include "rockchip_display.h"
 #include "rockchip_panel.h"
 
 static int adv7391_init(struct adv7391 *adv7391);
 static void drm_adv7391_select_output(struct overscan *overscan,
 				     struct drm_display_mode *mode);
-static int adv7391_get_timing(struct udevice *dev);
-
-// struct rockchip_connector_funcs *rockchip_rgb_connector_funcs;
-// struct rockchip_rgb_funcs *rv1126_rgb_funcs;
-// struct rockchip_connector *rv1126_rgb_driver_data;
-
-/*static int setup_rgb_output(struct udevice *dev)
-{
-    struct rockchip_rgb *rgb;
-    int ret;
-
-    ret = uclass_get_device_by_name(UCLASS_DISPLAY, "rgb", &dev);
-    if (ret) {
-        printf("Failed to get Rockchip RGB device\n");
-        return ret;
-    }
-
-    rgb = dev_get_priv(dev);
-
-	printf((NULL == rgb) ? "RGB is NULL...\n" : "RGB is OKOKOK!!!\n");
-	printf("0x%08X\n", (unsigned int)rgb);
-	printf("0x%08X\n", (unsigned int)dev);
-
-	rv1126_rgb_driver_data = (struct rockchip_connector*)dev_get_driver_data(dev);
-	rv1126_rgb_funcs = (struct rockchip_rgb_funcs*)(rv1126_rgb_driver_data->data);
-	rockchip_rgb_connector_funcs = (struct rockchip_connector_funcs*)(rv1126_rgb_driver_data->funcs);
-	
-	printf((NULL != rv1126_rgb_driver_data) ? "DATA1 OK!\n" : "DATA1 is null...\n");
-	printf((NULL != rockchip_rgb_connector_funcs) ? "DATA2 OK!\n" : "DATA2 is null...\n");
-	printf((NULL != rv1126_rgb_funcs) ? "DATA3 OK!\n" : "DATA3 is null...\n");
-
-	struct display_state a;
-	
-	// rv1126_rgb_funcs->prepare(rgb, 1);
-
-	ret = rockchip_rgb_connector_funcs->pre_init(&a);
-	if (ret) {
-        printf("Failed to pre_init\n");
-    }
-
-	rockchip_rgb_connector_funcs->init(&a);
-	if (ret) {
-        printf("Failed to init\n");
-    }
-	
-	rockchip_rgb_connector_funcs->prepare(&a);
-	if (ret) {
-        printf("Failed to prepare\n");
-    }
-
-    // priv = dev_get_uclass_priv(dev);
-
-
-
-    // Configure the RGB parameters as needed
-    // priv->format = ROCKCHIP_RGB //ROCKCHIP_RGB_FORMAT_RGB888;
-    // priv->bus_width = 24;
-
-    // Initialize the RGB output
-    // ret = rockchip_rgb_init(rgb);
-    if (ret) {
-        printf("Failed to initialize Rockchip RGB\n");
-        return ret;
-    }
-
-    printf("ROCKCHIP RGB OUTPUT INITIALIZED SUCCESSFULLY\n");
-    return 0;
-}*/
-
-/* TEST PATTERN */
-static const u8 adv7390_init_reg_val[11][2] = {
-	{ADV739X_SOFT_RESET, ADV739X_SOFT_RESET_DEFAULT},
-	{ADV739X_POWER_MODE_REG, ADV739X_POWER_MODE_REG_DEFAULT},
-	{ADV739X_MODE_SELECT_REG, SD_INPUT_MODE}, // SD input
-	{ADV739X_SD_MODE_REG1, ADV7390_SD_MODE_REG1_DEFAULT}, // SD luma filter Luma SSAF
-	{ADV739X_SD_MODE_REG2, ADV7390_SD_MODE_REG2_DEFAULT}, // SD PrPb SSAF filter, SD DAC Output 1, SD pedestal, SD pixel data valid, SD active video edge control
-	{ADV739X_SD_MODE_REG6, ADV7390_SD_MODE_REG6_DEFAULT}, // SD PAL/SECAM input standard autodetection
-	{0x01, 0x00},
-	{0x80, 0x00},
-    {0x82, 0xCB},
-	{0x84, 0x48}, /** test patern SD */
-	{0x87, 0x20},
-};
-
-// static const struct drm_display_mode adv739x_cvbs_mode[2] = {
-// 	{ DRM_MODE("720x576", DRM_MODE_TYPE_DRIVER, 27000, 
-// 			720, 732, 738, 864, 0, 576, 582, 588, 625, 0,
-// 		   DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC ),
-// 		   .vrefresh = 50, 0, .private_flags = DRM_MODE_FLAG_INTERLACE},
-// 	{ DRM_MODE("720x480", DRM_MODE_TYPE_DRIVER, 27000, 720, 736,
-// 		   742, 858, 0, 480, 486, 492, 529, 0,
-// 		   DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC),
-// 		   .vrefresh = 60, 0, .private_flags = DRM_MODE_FLAG_INTERLACE},
-// };
+static int adv7391_tve_get_timing(struct udevice *dev);
 
 static int adv7391_probe(struct udevice *dev)
 {
     int ret = 0;
 
-	printf("\t***** ADV7391_PROBE() *****\n");
-
-	struct adv7391 *adv7391 = dev_get_priv(dev);
-    if (NULL == adv7391) {
-        printf("\tDevice not found\n");
-        return CMD_RET_FAILURE;
-    }
-	else
-	{
-        printf("\tADV7391 priv OK\n");
-	}
-
-	adv7391->dev = dev;
+    struct adv7391 *adv7391 = dev_get_priv(dev);
+    adv7391->dev = dev;
 
 	ret = gpio_request_by_name(adv7391->dev, "reset-gpio-pin", 0,
 				   &adv7391->reset_gpio, GPIOD_IS_OUT);
@@ -152,17 +49,15 @@ static int adv7391_probe(struct udevice *dev)
 		dev_err(dev, "\tCannot get reset GPIO: %d\n", ret);
 		return ret;
 	}
-	else
-	{
-		printf("\tGPIO is OK\n");
-	}
 
-    return ret;
+    return adv7391_init(adv7391);
 }
 
 static int adv7391_init(struct adv7391 *adv7391)
 {
     int ret = 0;
+
+    // adv7391_tve_get_timing(adv7391->dev);
 
     dm_gpio_set_value(&adv7391->reset_gpio, 1);
 	mdelay(100);
@@ -180,6 +75,7 @@ static int adv7391_init(struct adv7391 *adv7391)
     }
     mdelay(100);
 
+
     u8 reg = 0x00;
     u8 val = 0x00;
 
@@ -188,7 +84,7 @@ static int adv7391_init(struct adv7391 *adv7391)
     ret = dm_i2c_write(adv7391->dev, reg, &val, 1);
     if (ret)
     {
-        printf("\tSW reset ret FAIL, code %d)\n", ret);
+        printf("SW reset ret FAIL, code %d)\n", ret);
         return ret;
     }
     else
@@ -197,7 +93,22 @@ static int adv7391_init(struct adv7391 *adv7391)
     }
     mdelay(100);
 
-	/* Show test image */
+    static const u8 adv7390_init_reg_val[11][2] = {
+
+    	{ADV739X_SOFT_RESET, ADV739X_SOFT_RESET_DEFAULT},
+    	{ADV739X_POWER_MODE_REG, ADV739X_POWER_MODE_REG_DEFAULT},
+    	{ADV739X_MODE_SELECT_REG, SD_INPUT_MODE}, // SD input
+    	{ADV739X_SD_MODE_REG1, ADV7390_SD_MODE_REG1_DEFAULT}, // SD luma filter Luma SSAF
+    	{ADV739X_SD_MODE_REG2, ADV7390_SD_MODE_REG2_DEFAULT}, // SD PrPb SSAF filter, SD DAC Output 1, SD pedestal, SD pixel data valid, SD active video edge control
+    	{ADV739X_SD_MODE_REG6, ADV7390_SD_MODE_REG6_DEFAULT}, // SD PAL/SECAM input standard autodetection
+    	{0x01, 0x00},
+    	{0x80, 0x00},
+        {0x82, 0xCB},
+    	{0x84, 0x48}, /** test patern SD */
+    	{0x87, 0x20},
+    };
+
+
     for (int i = 0; i < 11; i++)
     {
         ret = dm_i2c_write(adv7391->dev,
@@ -208,7 +119,6 @@ static int adv7391_init(struct adv7391 *adv7391)
     
     return 0;
 
-	/* Basic initialization, PAL mode only */
     reg = 0x00; // Power mode
     // val = 0x1C; // DAC 1, 2, 3 on, PLL enable
     val = 0x10; // DAC 1 on
@@ -277,7 +187,6 @@ static int adv7391_init(struct adv7391 *adv7391)
 
     mdelay(100);
 
-	/* Just read ADV7391 registers to ensure I2C works (like i2c_detect but for registers) */
     // for (reg = 0x00; reg < 0xDF; reg++)
     // {
     //     int ret = dm_i2c_read(adv7391->dev, reg, &val, 1);
@@ -287,14 +196,45 @@ static int adv7391_init(struct adv7391 *adv7391)
     return ret;
 }
 
-static int adv7391_get_timing(struct udevice *dev)
+// static void rk1000_tve_bridge_enable(struct rockchip_bridge *bridge)
+// {
+// 	u8 tv_encoder_regs_pal[] = {0x06, 0x00, 0x00, 0x03, 0x00, 0x00};
+// 	u8 tv_encoder_control_regs_pal[] = {0x41, 0x01};
+// 	u8 tv_encoder_regs_ntsc[] = {0x00, 0x00, 0x00, 0x03, 0x00, 0x00};
+// 	u8 tv_encoder_control_regs_ntsc[] = {0x43, 0x01};
+// 	char data[4] = {0x88, 0x00, 0x22, 0x00};
+// 	struct adv7391 *adv7391 = dev_get_priv(bridge->dev);
+// 	struct connector_state *conn_state = &bridge->state->conn_state;
+// 	struct drm_display_mode *mode = &conn_state->mode;
+// 	// struct rk1000_ctl *rk1000_ctl = &rk1000_tve->rk1000_ctl;
+
+// 	// rk1000_ctl_write_block(rk1000_ctl, 0, (u8 *)data, 4);
+
+// 	/* rk1000 power down output dac */
+// 	data[0] = 0x07;
+// 	// rk1000_tv_write_block(adv7391, 0x03, (u8 *)data, 1);
+
+// 	if (mode->vdisplay == 576) {
+// 		// rk1000_tv_write_block(adv7391, 0, tv_encoder_regs_pal,
+// 		// 		      sizeof(tv_encoder_regs_pal));
+// 		// rk1000_ctl_write_block(rk1000_ctl, 3,
+// 		// 		       tv_encoder_control_regs_pal,
+// 		// 		       sizeof(tv_encoder_control_regs_pal));
+// 	} else {
+// 		// rk1000_tv_write_block(rk1000_tve, 0, tv_encoder_regs_ntsc,
+// 		// 		      sizeof(tv_encoder_regs_ntsc));
+// 		// rk1000_ctl_write_block(rk1000_ctl, 3,
+// 		// 		       tv_encoder_control_regs_ntsc,
+// 		// 		       sizeof(tv_encoder_control_regs_ntsc));
+// 	}
+// }
+
+static int adv7391_tve_get_timing(struct udevice *dev)
 {
-    printf("\tadv7391_get_timing");
+    printf("\n\n\tAAAAAA\n\n");
 
 	struct rockchip_bridge *bridge =
 		(struct rockchip_bridge *)dev_get_driver_data(dev);
-	printf("\tBridge is %s\n", NULL == bridge ? "NULL" : "OK");
-	bridge->dev = dev;
 
 	struct connector_state *conn_state = &bridge->state->conn_state;
 	struct drm_display_mode *mode = &conn_state->mode;
@@ -343,7 +283,7 @@ static void drm_adv7391_select_output(struct overscan *overscan,
 
     ret = part_get_info_by_name(dev_desc, "baseparameter", &part_info);
 	if (ret < 0) {
-		printf("\tCould not find baseparameter partition, %d\n", ret);
+		printf("Could not find baseparameter partition, %d\n", ret);
 		return;
 	}
 
@@ -414,34 +354,12 @@ static void drm_adv7391_select_output(struct overscan *overscan,
 	}
 }
 
-static void adv7391_bridge_enable(struct rockchip_bridge *bridge)
-{
-	printf("\t***** adv7391_bridge_enable\n");
-}
-
-static void adv7391_bridge_disable(struct rockchip_bridge *bridge)
-{
-	printf("\t***** adv7391_bridge_disable\n");
-}
-
-static const struct rockchip_bridge_funcs adv7391_bridge_funcs = {
-	.enable = adv7391_bridge_enable,
-	.disable = adv7391_bridge_disable,
-};
-
-static struct rockchip_bridge adv7391_driver_data = {
-	.funcs = &adv7391_bridge_funcs,
-};
-
 struct video_bridge_ops adv7391_ops = {
-	.get_timing = adv7391_get_timing,
+	.get_timing = adv7391_tve_get_timing,
 };
 
 static const struct udevice_id adv7391_of_match[] = {
-	{
-		.compatible = "adi,adv7391",
-		.data = (ulong)&adv7391_driver_data,
-	},
+	{ .compatible = "adi,adv7391" },
 	{}
 };
 
@@ -453,75 +371,3 @@ U_BOOT_DRIVER(adv7391) = {
     .probe = adv7391_probe,
     .priv_auto_alloc_size = sizeof(struct adv7391),
 };
-
-static int do_adv7391_command(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
-{
-    if (argc != 2) {
-        printf("Usage: adv7391_bridge <en/dis>\n");
-        return CMD_RET_USAGE;
-    }
-
-	int ret = 0;
-    struct udevice *dev = NULL;
-
-    ret = uclass_get_device_by_name(UCLASS_VIDEO_BRIDGE, "adv7391", &dev);
-    if (ret) {
-        printf("Device not found\n");
-        // return CMD_RET_FAILURE;
-    }
-	else
-	{
-        printf("Device adv7391 found\n");
-	}
-
-	struct adv7391 *adv7391 = dev_get_priv(dev);
-    if (NULL == adv7391) {
-        printf("Device not found\n");
-        // return CMD_RET_FAILURE;
-    }
-	else
-	{
-        printf("ADV7391 priv OK\n");
-	}
-
-	adv7391->dev = dev;
-	
-	struct video_bridge_ops *ops = (struct video_bridge_ops*)dev->driver->ops;
-    if (NULL == ops) {
-        printf("Video bridge options not found\n");
-        // return CMD_RET_FAILURE;
-    }
-	else
-	{
-        printf("Video bridge options found\n");
-	}
-
-	ret = ops->get_timing(dev);
-    if (ret) {
-        printf("Error RGB\n");
-        // return CMD_RET_FAILURE;
-    }
-	else
-	{
-        printf("RGB OK\n");
-	}
-
-	ret = adv7391_init(adv7391);
-    if (ret) {
-        printf("Error ADV7391 init\n");
-        // return CMD_RET_FAILURE;
-    }
-	else
-	{
-        printf("ADV7391 init Finished\n");
-	}
-
-    // printf("GPIO %d value is %d\n", offset, value);
-    return CMD_RET_SUCCESS;
-}
-
-U_BOOT_CMD(
-    adv7391, 2, 1, do_adv7391_command,
-    "Enabling/Disabling ADV7391",
-    "This command accepts a single argument: \"enable\" or \"disable\" (Short form and all csaes supported). Use it to toggle a specific feature or setting.\n"
-);

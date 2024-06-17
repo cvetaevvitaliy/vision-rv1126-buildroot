@@ -18,6 +18,10 @@
 
 struct adv7391 {
 	struct udevice *dev;
+	struct gpio_desc reset_gpio;
+	struct udevice *rgb_dev;
+
+	// uint8_t address;
 };
 
 #endif // _ADV7391_H_
