@@ -294,7 +294,7 @@ FFMPEG_DEPENDENCIES += mpp libion
 FFMPEG_CONF_OPTS += --enable-rkmpp --extra-cflags="-D CONFIG_ION"
 else
 FFMPEG_DEPENDENCIES += mpp libdrm
-FFMPEG_CONF_OPTS += --enable-rkmpp --enable-libdrm --enable-decoder=hevc_rkmpp --enable-encoder=hevc_rkmpp --enable-decoder=hevc --enable-encoder=hevc
+FFMPEG_CONF_OPTS += --enable-rkmpp --enable-libdrm --enable-decoder=hevc_rkmpp --enable-encoder=hevc_rkmpp --enable-decoder=hevc --enable-encoder=hevc --enable-decoder=h264_rkmpp --enable-encoder=h264_rkmpp
 endif
 # --disable-v4l2-m2m seems no effect, disable each v4l2m2m
 FFMPEG_CONF_OPTS += \
