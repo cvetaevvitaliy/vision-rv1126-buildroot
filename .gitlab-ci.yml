@@ -56,6 +56,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - cp -L rockdev_sdk/vision-sdk.tar.gz artifacts_sdk/
 
     - echo "BR2_PACKAGE_VISION_ENCRYPTED=y" >> buildroot/configs/rockchip_rv1126_vision_defconfig
+    - rm buildroot/output/rockchip_rv1126_vision/.config*
 
     - echo "Sourcing env setup"
     - source envsetup.sh rockchip_rv1126_vision
