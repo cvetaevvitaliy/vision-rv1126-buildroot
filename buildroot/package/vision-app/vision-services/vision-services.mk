@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-VISION_SERVICES_VERSION = 0.4.2
+VISION_SERVICES_VERSION =  new_config
 VISION_SERVICES_SITE = ssh://git@gitlab.hard-tech.org.ua/vision/vision-services.git
 VISION_SERVICES_SITE_METHOD = git
 VISION_SERVICES_INSTALL_STAGING = NO
@@ -102,6 +102,7 @@ define VISION_SERVICES_INSTALL_SCRIPTS
 endef
 
 define VISION_SERVICES_INSTALL_AI_MODEL
+	mkdir -p ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/ai_model/
 	$(INSTALL) -D -m  644 $(@D)/assets/ai_model/* ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/ai_model/
 endef
 
