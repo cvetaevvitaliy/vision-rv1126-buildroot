@@ -55,28 +55,34 @@ build-job:       # This job runs in the build stage, which runs first.
     - mkdir -p artifacts_sdk/
     - cp -L rockdev_sdk/vision-sdk.tar.gz artifacts_sdk/
 
-    - bash build.sh cleanall
-
-    - echo "BR2_PACKAGE_VISION_ENCRYPTED=y" >> buildroot/configs/rockchip_rv1126_vision_defconfig
-    - rm -f buildroot/output/rockchip_rv1126_vision/.config*
+    - echo "Compile complete."
 
     - echo "Sourcing env setup"
     - source envsetup.sh rockchip_rv1126_vision
+    - echo "BR2_PACKAGE_VISION_ENCRYPTED=y" >> buildroot/output/rockchip_rv1126_vision/.config
 
-    - echo "Start Build secure buildroot... "
-    - bash build.sh
+    - cd buildroot
+    - make vision-services-rebuild
+    - cd ..
+    - |
+      echo "Start Build secure buildroot... "
+      { yes || :; } | bash build.sh rootfs
+      bash build.sh recovery
+      bash mkfirmware.sh
+      bash build.sh updateimg
 
+    - echo "Prepare secure images... "
     - mkdir -p artifacts_secure
     - cp -L -r rockdev/* artifacts_secure/
 
-    - echo "Compile complete. All jobs done"
+    - echo "Compile secure firmware complete."
 
   artifacts:
       paths:
         - artifacts/*
-        - artifacts_secure/*
         - artifacts_sdk/*
-      expire_in: 2 week    
+        - artifacts_secure/*
+      expire_in: 2 week
 
 test-job: # This job runs in the test stage, which runs second.
   stage: test

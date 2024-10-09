@@ -41,7 +41,7 @@ ifeq ($(BR2_PACKAGE_VISION_DETECTION_SERVICE),y)
 	VISION_SERVICES_CONF_OPTS += "-DBUILD_DETECTION_SERVICE=ON"
 	VISION_SERVICES_DEPENDENCIES += rknpu
 	VISION_SERVICES_ENCRYPT_LIST += oem/usr/bin/vision-detection-service
-	VISION_SERVICES_ENCRYPT_LIST += etc/init.d/S99vision-detection-service
+	VISION_SERVICES_ENCRYPT_LIST += oem/usr/init.d/S99vision-detection-service
 else
 	VISION_SERVICES_CONF_OPTS += "-DBUILD_DETECTION_SERVICE=OFF"
 endif
@@ -86,7 +86,7 @@ endif
 
 
 define VISION_SERVICES_INSTALL_CONFIG
-	$(INSTALL) -D -m  644 $(@D)/assets/default_config.ini ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/etc/vision/config.ini  
+	$(INSTALL) -D -m  644 $(@D)/assets/default_config.json ${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/etc/vision/config.json
 endef
 
 define VISION_SERVICES_INSTALL_ASSETS
@@ -146,6 +146,8 @@ define VISION_SERVICES_ENCRYPT_SERVICES
 	$(foreach svc,$(VISION_SERVICES_ENCRYPT_LIST),$(call VIS_SEC_PREPARE,$(svc)))
 
 	$(call VIS_SEC_PREPARE,oem/ai_model/default_model.rknn)
+	$(call VIS_SEC_PREPARE,oem/ai_model/yolov7_tiny.rknn)
+	$(call VIS_SEC_PREPARE,oem/ai_model/default_anchors.txt)
 
 	tar cvzf /tmp/vision_security.tar.gz -C /tmp/vision_security/ .
 	cd "${TOPDIR}/../tools/Security"; ./encrypt.sh /tmp/vision_security.tar.gz "${BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR}/assets/vs.bin"
