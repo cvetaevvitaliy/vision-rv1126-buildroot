@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-VISION_SERVICES_VERSION =  new_config
+VISION_SERVICES_VERSION =  0.5.0
 VISION_SERVICES_SITE = ssh://git@gitlab.hard-tech.org.ua/vision/vision-services.git
 VISION_SERVICES_SITE_METHOD = git
 VISION_SERVICES_INSTALL_STAGING = NO
@@ -109,7 +109,6 @@ endef
 
 define VISION_SERVICES_INSTALL_SCRIPTS
 	$(INSTALL) -D -m  755 $(@D)/assets/init.d/* "${TARGET_DIR}/etc/init.d/"
-	$(INSTALL) -D -m  755 $(@D)/assets/osd_menu_nav.sh "${TARGET_DIR}/usr/bin/osd_menu_nav.sh"
 endef
 
 define VISION_SERVICES_INSTALL_AI_MODEL
