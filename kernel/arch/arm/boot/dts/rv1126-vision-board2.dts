@@ -80,6 +80,12 @@
 
 };
 
+// Watchdog if needed
+&wdt {
+	status = "disabled";
+	//status = "okay";
+};
+
 &saradc {
 	status = "okay";
 	vref-supply = <&vcc_1v8>;

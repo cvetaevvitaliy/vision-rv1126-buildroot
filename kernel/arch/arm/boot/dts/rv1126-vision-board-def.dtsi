@@ -18,22 +18,30 @@
 };
 
 &cpu0 {
+	dynamic-power-coefficient = <75>;
 	cpu-supply = <&vdd_arm_logic>;
+	///delete-property/ operating-points-v2;
 	clock-frequency = <1512000000>;
 };
 
 &cpu1 {
+	dynamic-power-coefficient = <75>;
 	cpu-supply = <&vdd_arm_logic>;
+	///delete-property/ operating-points-v2;
 	clock-frequency = <1512000000>;
 };
 
 &cpu2 {
+	dynamic-power-coefficient = <75>;
 	cpu-supply = <&vdd_arm_logic>;
+	///delete-property/ operating-points-v2;
 	clock-frequency = <1512000000>;
 };
 
 &cpu3 {
+	dynamic-power-coefficient = <75>;
 	cpu-supply = <&vdd_arm_logic>;
+	///delete-property/ operating-points-v2;
 	clock-frequency = <1512000000>;
 };
 
@@ -54,6 +62,10 @@
 	supports-emmc;
 	/delete-property/ pinctrl-names;
 	/delete-property/ pinctrl-0;
+	pinctrl-names = "default";
+	pinctrl-0 = <&emmc_clk &emmc_cmd &emmc_bus8>;
+	// for change bus bus-width to 4 line use property: pinctrl-0 = <&emmc_clk &emmc_cmd &emmc_bus4>;
+	// all soc pins pins defined in the file: rv1126-pinctrl.dtsi
 	status = "okay";
 };
 

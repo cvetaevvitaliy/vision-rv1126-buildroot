@@ -240,6 +240,19 @@
 				/* emmc_d7 */
 				<0 RK_PD3 2 &pcfg_pull_up_drv_level_2>;
 		};
+
+		emmc_bus4: emmc-bus4 {
+			rockchip,pins =
+				/* emmc_d0 */
+				<0 RK_PC4 2 &pcfg_pull_up_drv_level_2>,
+				/* emmc_d1 */
+				<0 RK_PC5 2 &pcfg_pull_up_drv_level_2>,
+				/* emmc_d2 */
+				<0 RK_PC6 2 &pcfg_pull_up_drv_level_2>,
+				/* emmc_d3 */
+				<0 RK_PC7 2 &pcfg_pull_up_drv_level_2>;
+		};
+
 		/omit-if-no-ref/
 		emmc_clk: emmc-clk {
 			rockchip,pins =
